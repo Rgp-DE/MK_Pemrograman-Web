@@ -127,13 +127,19 @@ td button {
     font-size: 0.85rem;
 }
 
-td button:first-of-type {
-    background-color: #f0ad4e;
+/* ===== Tombol Aksi (Refactor pakai Class) ===== */
+td button.btn-edit {
+    background-color: #f0ad4e; /* Warna Oranye */
     color: #fff;
 }
 
-td button:last-of-type {
-    background-color: #d9534f;
+td button.btn-detail {
+    background-color: #0ac9e6; /* Warna Biru Muda/Cyan */
+    color: #fff;
+}
+
+td button.btn-hapus {
+    background-color: #d9534f; /* Warna Merah */
     color: #fff;
 }
 
