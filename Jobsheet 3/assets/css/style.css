@@ -193,3 +193,10 @@ footer {
         max-width: 1200px;
     }
 }
+
+/* ===== Breakpoint Tablet ===== */
+@media (max-width: 900px) {
+    main section:nth-of-type(2) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
