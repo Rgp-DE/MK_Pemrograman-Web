@@ -187,4 +187,9 @@ footer {
     font-size: 0.9rem;
 }
 
-
+/* ===== Breakpoint Layar Sangat Lebar ===== */
+@media (min-width: 1400px) {
+    main {
+        max-width: 1200px;
+    }
+}
