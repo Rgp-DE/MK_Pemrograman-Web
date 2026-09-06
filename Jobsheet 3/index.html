@@ -3,8 +3,6 @@
 
 <head>
     <meta charset="UTF-8">
-
-    <!-- Penting untuk responsive design -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>SIMPUS-Mini | Beranda</title>
@@ -17,6 +15,12 @@
     <header>
         <h1>SIMPUS-Mini</h1>
 
+        <!-- Checkbox sebagai state hamburger -->
+        <input
+            type="checkbox"
+            id="nav-toggle"
+            class="nav-toggle">
+
         <nav>
             <ul>
                 <li><a href="index.html">Beranda</a></li>
@@ -26,6 +30,14 @@
                 <li><a href="anggota/tambah.html">Tambah Anggota</a></li>
             </ul>
         </nav>
+
+        <!-- MODIFIKASI JOBSHEET 3 NO.4 -->
+        <!-- Label hamburger dipindahkan setelah nav -->
+        <label
+            for="nav-toggle"
+            class="nav-toggle-label">
+            ☰
+        </label>
     </header>
 
     <main>
@@ -38,7 +50,6 @@
             </p>
         </section>
 
-        <!-- Section Statistik -->
         <section class="statistik">
             <h2>Ringkasan</h2>
 
@@ -63,7 +74,6 @@
             </article>
         </section>
 
-        <!-- Modifikasi Jobsheet 3 No.3 -->
         <section>
             <h2>Contoh Blok Kode</h2>
 
