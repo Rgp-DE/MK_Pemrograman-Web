@@ -21,11 +21,13 @@ a:hover {
     text-decoration: underline;
 }
 
+
 /* ===== Header & Navbar (Flexbox) ===== */
 header {
     background-color: #2d6a4f;
     color: #fff;
     padding: 1rem 1.5rem;
+
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -47,6 +49,7 @@ header nav a {
     font-weight: 500;
 }
 
+
 /* ===== Main Layout ===== */
 main {
     max-width: 1000px;
@@ -59,6 +62,7 @@ section {
     border-radius: 8px;
     padding: 1.5rem;
     margin-bottom: 1.5rem;
+
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
@@ -67,31 +71,56 @@ section h2 {
     color: #2d6a4f;
 }
 
+
 /* ===== Kartu Statistik (CSS Grid) ===== */
-main section:nth-of-type(2) {
+.statistik {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 1rem;
 }
 
-main section:nth-of-type(2) article {
+.statistik h2 {
+    grid-column: 1 / -1;
+}
+
+.statistik article {
     background-color: #eef4fa;
     border-radius: 8px;
     padding: 1.25rem;
     text-align: center;
 }
 
-main section:nth-of-type(2) article h3 {
+.statistik article h3 {
     font-size: 0.95rem;
     color: #55677a;
     margin-bottom: 0.5rem;
 }
 
-main section:nth-of-type(2) article p {
+.statistik article p {
     font-size: 1.8rem;
     font-weight: 700;
     color: #2d6a4f;
 }
+
+
+/* ===== Elemen Responsive Selain Tabel ===== */
+.code-responsive {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.code-responsive pre {
+    min-width: 700px;
+    padding: 1rem;
+
+    background-color: #f7f9fb;
+
+    border-radius: 6px;
+
+    font-family: Consolas, "Courier New", monospace;
+    white-space: pre;
+}
+
 
 /* ===== Tabel ===== */
 table {
@@ -99,7 +128,8 @@ table {
     border-collapse: collapse;
 }
 
-th, td {
+th,
+td {
     text-align: left;
     padding: 0.65rem 0.75rem;
     border-bottom: 1px solid #e2e6ea;
@@ -121,27 +151,32 @@ tbody tr:hover {
 td button {
     padding: 0.35rem 0.7rem;
     margin-right: 0.35rem;
+
     border: none;
     border-radius: 4px;
+
     cursor: pointer;
+
     font-size: 0.85rem;
 }
 
-/* ===== Tombol Aksi (Refactor pakai Class) ===== */
+
+/* ===== Tombol Aksi ===== */
 td button.btn-edit {
-    background-color: #f0ad4e; /* Warna Oranye */
+    background-color: #f0ad4e;
     color: #fff;
 }
 
 td button.btn-detail {
-    background-color: #0ac9e6; /* Warna Biru Muda/Cyan */
+    background-color: #0ac9e6;
     color: #fff;
 }
 
 td button.btn-hapus {
-    background-color: #d9534f; /* Warna Merah */
+    background-color: #d9534f;
     color: #fff;
 }
+
 
 /* ===== Form ===== */
 form p {
@@ -151,6 +186,7 @@ form p {
 form label {
     display: block;
     margin-bottom: 0.35rem;
+
     font-weight: 600;
     color: #444;
 }
@@ -159,33 +195,45 @@ form input,
 form select {
     width: 100%;
     max-width: 400px;
+
     padding: 0.55rem 0.7rem;
+
     border: 1px solid #cdd4da;
     border-radius: 4px;
+
     font-size: 1rem;
 }
 
 form button[type="submit"] {
     background-color: #2d6a4f;
     color: #fff;
+
     border: none;
-    padding: 0.6rem 1.5rem;
     border-radius: 4px;
+
+    padding: 0.6rem 1.5rem;
+
     font-size: 1rem;
+
     cursor: pointer;
 }
 
 form button[type="submit"]:hover {
-    background-color: #164869;
+    background-color: #1b4332;
 }
+
 
 /* ===== Footer ===== */
 footer {
     text-align: center;
+
     padding: 1.25rem;
+
     color: #7a8794;
+
     font-size: 0.9rem;
 }
+
 
 /* ===== Breakpoint Layar Sangat Lebar ===== */
 @media (min-width: 1400px) {
@@ -194,9 +242,10 @@ footer {
     }
 }
 
+
 /* ===== Breakpoint Tablet ===== */
 @media (max-width: 900px) {
-    main section:nth-of-type(2) {
+    .statistik {
         grid-template-columns: repeat(2, 1fr);
     }
 }
