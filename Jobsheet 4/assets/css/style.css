@@ -282,6 +282,61 @@ footer {
     font-size: 0.9rem;
 }
 
+/* ===== Halaman Login ===== */
+.login-main {
+    min-height: calc(100vh - 150px);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-section {
+    width: 100%;
+    max-width: 450px;
+
+    margin: 2rem auto;
+}
+
+.login-section h2 {
+    text-align: center;
+}
+
+.login-description {
+    text-align: center;
+
+    margin-bottom: 1.5rem;
+
+    color: #55677a;
+}
+
+.login-form {
+    width: 100%;
+}
+
+.login-form p {
+    margin-bottom: 1rem;
+}
+
+.login-form input {
+    width: 100%;
+    max-width: 100%;
+}
+
+.login-form button[type="submit"] {
+    width: 100%;
+
+    margin-top: 0.5rem;
+}
+
+.login-register {
+    margin-top: 1rem;
+
+    text-align: center;
+
+    font-size: 0.9rem;
+}
+
 
 /* ===== Breakpoint Layar Sangat Lebar ===== */
 @media (min-width: 1400px) {

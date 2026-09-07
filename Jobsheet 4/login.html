@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SIMPUS-Mini | Login</title>
+
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body>
+
+    <header>
+        <h1>SIMPUS-Mini</h1>
+
+        <input
+            type="checkbox"
+            id="nav-toggle"
+            class="nav-toggle">
+
+        <nav>
+            <ul>
+                <li><a href="index.html">Beranda</a></li>
+                <li><a href="buku/list.html">Daftar Buku</a></li>
+                <li><a href="buku/tambah.html">Tambah Buku</a></li>
+                <li><a href="anggota/list.html">Daftar Anggota</a></li>
+                <li><a href="anggota/tambah.html">Tambah Anggota</a></li>
+                <li><a href="login.html">Login</a></li>
+            </ul>
+        </nav>
+
+        <label
+            for="nav-toggle"
+            class="nav-toggle-label">
+            ☰
+        </label>
+    </header>
+
+    <main class="login-main">
+
+        <section class="login-section">
+
+            <h2>Login</h2>
+
+            <p class="login-description">
+                Silakan masuk menggunakan akun SIMPUS-Mini.
+            </p>
+
+            <form class="login-form">
+
+                <p>
+                    <label for="email">Email</label>
+
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="Masukkan email"
+                        required>
+                </p>
+
+                <p>
+                    <label for="password">Password</label>
+
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Masukkan password"
+                        required>
+                </p>
+
+                <p>
+                    <button type="submit">
+                        Masuk
+                    </button>
+                </p>
+
+            </form>
+
+            <p class="login-register">
+                Belum memiliki akun?
+                <a href="wireframe/registrasi-anggota.txt">
+                    Registrasi Anggota Baru
+                </a>
+            </p>
+
+        </section>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2026 SIMPUS-Mini &mdash; Jobsheet 4</p>
+    </footer>
+
+</body>
+
+</html>
