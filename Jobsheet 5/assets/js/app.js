@@ -103,9 +103,9 @@ function initValidasiForm() {
         const stok = form.querySelector("[name='stok']");
 
         if (stok) {
-            const nilai = parseInt(stok.value, 10);
+            const nilai = parseInt(stok.value, 10);                                                                             
 
-            if (isNaN(nilai) || nilai < 0) {
+            if (isNaN(nilai) || nilai < 0) {                                                                                                                                                                                                                                                                                                                                                                                                                                    
                 tampilkanError(
                     stok,
                     "Stok tidak boleh negatif."
@@ -116,9 +116,26 @@ function initValidasiForm() {
             }
         }
 
+        const isbn = form.querySelector("[name='isbn']");
+
+        if (isbn) {
+            const nilai = isbn.value.trim();
+
+            if (nilai !== "" && !/^[0-9-]+$/.test(nilai)) {
+                tampilkanError(
+                    isbn,
+                    "ISBN hanya boleh berisi angka dan tanda hubung (-)."
+                );
+                valid = false;
+            } else {
+                hapusError(isbn);
+            }
+        }
+
         if (!valid) {
             e.preventDefault();
         }
+
     });
 }
 
