@@ -1,4 +1,4 @@
-// ===== Hamburger menu (JS-driven, menggantikan checkbox hack) =====
+// ===== Hamburger menu (JS-driven) =====
 function initNavToggle() {
     const toggleBtn = document.getElementById("nav-toggle-btn");
     const nav = document.querySelector("header nav");

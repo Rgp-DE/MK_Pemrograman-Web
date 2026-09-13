@@ -405,30 +405,48 @@ footer {
 @media (max-width: 600px) {
 
     header {
-        align-items: center;
+        display: block;
+    }
+
+    header h1 {
+        display: inline-block;
     }
 
     .nav-toggle-label {
         display: block;
+
+        float: right;
     }
 
     header nav {
         width: 100%;
 
-        display: none;
+        clear: both;
+        padding-top: 1rem;
+
+        /* Kondisi awal: menu tertutup */
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+
+        /* Animasi menu */
+        transition:
+            max-height 0.4s ease,
+            opacity 0.3s ease;
     }
 
     header nav ul {
+        display: flex;
+
         flex-direction: column;
 
         gap: 0.5rem;
-
-        padding-top: 1rem;
     }
 
-    /* Navbar dibuka oleh JavaScript */
+    /* Kondisi saat hamburger diklik */
     header nav.nav-open {
-        display: block;
+        max-height: 300px;
+        opacity: 1;
     }
 
     .statistik {
