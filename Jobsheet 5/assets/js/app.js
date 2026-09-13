@@ -103,24 +103,32 @@ function initValidasiForm() {
     form.addEventListener("submit", function (e) {
         let valid = true;
 
-        const judul = form.querySelector("[name='judul'], [name='nama']");
+        // Daftar field yang wajib diisi
+        const fieldWajib = [
+            "judul",
+            "nama",
+            "pengarang"
+        ];
 
-        if (judul && judul.value.trim() === "") {
-            tampilkanError(judul, "Field ini wajib diisi.");
-            valid = false;
-        } else if (judul) {
-            hapusError(judul);
-        }
+        fieldWajib.forEach(function (namaField) {
+            const input = form.querySelector(
+                "[name='" + namaField + "']"
+            );
 
-        const pengarang = form.querySelector("[name='pengarang']");
+            if (!input) return;
 
-        if (pengarang && pengarang.value.trim() === "") {
-            tampilkanError(pengarang, "Pengarang wajib diisi.");
-            valid = false;
-        } else if (pengarang) {
-            hapusError(pengarang);
-        }
+            if (input.value.trim() === "") {
+                tampilkanError(
+                    input,
+                    "Field ini wajib diisi."
+                );
+                valid = false;
+            } else {
+                hapusError(input);
+            }
+        });
 
+        // Validasi tahun terbit
         const tahun = form.querySelector("[name='tahun']");
 
         if (tahun) {
@@ -137,12 +145,13 @@ function initValidasiForm() {
             }
         }
 
+        // Validasi stok
         const stok = form.querySelector("[name='stok']");
 
         if (stok) {
-            const nilai = parseInt(stok.value, 10);                                                                             
+            const nilai = parseInt(stok.value, 10);
 
-            if (isNaN(nilai) || nilai < 0) {                                                                                                                                                                                                                                                                                                                                                                                                                                    
+            if (isNaN(nilai) || nilai < 0) {
                 tampilkanError(
                     stok,
                     "Stok tidak boleh negatif."
@@ -153,6 +162,7 @@ function initValidasiForm() {
             }
         }
 
+        // Validasi ISBN
         const isbn = form.querySelector("[name='isbn']");
 
         if (isbn) {
@@ -172,7 +182,6 @@ function initValidasiForm() {
         if (!valid) {
             e.preventDefault();
         }
-
     });
 }
 
