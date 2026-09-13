@@ -3,60 +3,70 @@
         "judul": "Laskar Pelangi",
         "pengarang": "Andrea Hirata",
         "tahun": 2005,
-        "stok": 4
+        "stok": 4,
+        "kategori": "Novel"
     },
     {
         "judul": "Bumi Manusia",
         "pengarang": "Pramoedya Ananta Toer",
         "tahun": 1980,
-        "stok": 2
+        "stok": 2,
+        "kategori": "Sejarah"
     },
     {
         "judul": "Negeri 5 Menara",
         "pengarang": "Ahmad Fuadi",
         "tahun": 2009,
-        "stok": 0
+        "stok": 0,
+        "kategori": "Novel"
     },
     {
         "judul": "Filosofi Teras",
         "pengarang": "Henry Manampiring",
         "tahun": 2018,
-        "stok": 5
+        "stok": 5,
+        "kategori": "Pengembangan Diri"
     },
     {
         "judul": "Ronggeng Dukuh Paruk",
         "pengarang": "Ahmad Tohari",
         "tahun": 1982,
-        "stok": 1
+        "stok": 1,
+        "kategori": "Novel"
     },
     {
         "judul": "Cantik Itu Luka",
         "pengarang": "Eka Kurniawan",
         "tahun": 2002,
-        "stok": 3
+        "stok": 3,
+        "kategori": "Novel"
     },
     {
         "judul": "Pulang",
         "pengarang": "Tere Liye",
         "tahun": 2015,
-        "stok": 2
+        "stok": 2,
+        "kategori": "Novel"
     },
     {
         "judul": "Sang Pemimpi",
         "pengarang": "Andrea Hirata",
         "tahun": 2006,
-        "stok": 6
+        "stok": 6,
+        "kategori": "Novel"
     },
     {
         "judul": "Perahu Kertas",
         "pengarang": "Dee Lestari",
         "tahun": 2009,
-        "stok": 0
+        "stok": 0,
+        "kategori": "Novel"
     },
     {
         "judul": "Gadis Kretek",
         "pengarang": "Ratih Kumala",
         "tahun": 2012,
-        "stok": 4
+        "stok": 4,
+        "kategori": "Novel"
     }
 ]

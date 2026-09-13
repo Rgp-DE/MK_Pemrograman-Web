@@ -62,7 +62,7 @@ async function muatDataJSON(namaFile, daftarKunci) {
 
     } catch (err) {
         tbody.innerHTML =
-            "<tr><td colspan=\"5\">Gagal memuat data: " +
+            "<tr><td colspan=\"6\">Gagal memuat data: " +
             err.message +
             "</td></tr>";
 
@@ -82,7 +82,7 @@ async function muatDataJSON(namaFile, daftarKunci) {
 function muatDaftarBuku() {
     return muatDataJSON(
         "buku.json",
-        ["judul", "pengarang", "tahun", "stok"]
+        ["judul", "pengarang", "tahun", "stok", "kategori"]
     );
 }
 
