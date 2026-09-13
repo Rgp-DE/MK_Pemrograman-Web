@@ -2,9 +2,13 @@
 async function muatDaftarAnggota() {
     const tbody = document.querySelector(".table-responsive table tbody");
     const loading = document.getElementById("loading-indicator");
+
     if (!tbody) return;
 
-    loading.style.display = "block";
+    if (loading) {
+        loading.style.display = "block";
+    }
+
     tbody.innerHTML = "";
 
     try {
@@ -30,7 +34,7 @@ async function muatDaftarAnggota() {
                 "<td>" + anggota.alamat + "</td>" +
                 "<td>" + anggota.no_hp + "</td>" +
                 "<td>" +
-                "<button type=\"button\">Edit</button> " +
+                "<button type=\"button\" class=\"btn-edit\">Edit</button> " +
                 "<button type=\"button\" class=\"btn-hapus\">Hapus</button>" +
                 "</td>";
 
@@ -44,9 +48,12 @@ async function muatDaftarAnggota() {
             "</td></tr>";
 
     } finally {
-        loading.style.display = "none";
+        if (loading) {
+            loading.style.display = "none";
+        }
     }
 }
+
 
 document.addEventListener(
     "DOMContentLoaded",

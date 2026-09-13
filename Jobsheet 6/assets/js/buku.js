@@ -2,9 +2,13 @@
 async function muatDaftarBuku() {
     const tbody = document.querySelector(".table-responsive table tbody");
     const loading = document.getElementById("loading-indicator");
+
     if (!tbody) return;
 
-    loading.style.display = "block";
+    if (loading) {
+        loading.style.display = "block";
+    }
+
     tbody.innerHTML = "";
 
     try {
@@ -30,12 +34,17 @@ async function muatDaftarBuku() {
                 "<td>" + buku.tahun + "</td>" +
                 "<td>" + buku.stok + "</td>" +
                 "<td>" +
-                "<button type=\"button\">Edit</button> " +
+                "<button type=\"button\" class=\"btn-edit\">Edit</button> " +
+                "<button type=\"button\" class=\"btn-detail\">Detail</button> " +
                 "<button type=\"button\" class=\"btn-hapus\">Hapus</button>" +
                 "</td>";
 
             tbody.appendChild(tr);
         });
+
+        updateTableCounter(
+            tbody.closest("table")
+        );
 
     } catch (err) {
         tbody.innerHTML =
@@ -43,12 +52,72 @@ async function muatDaftarBuku() {
             err.message +
             "</td></tr>";
 
+        updateTableCounter(
+            tbody.closest("table")
+        );
+
     } finally {
-        loading.style.display = "none";
+        if (loading) {
+            loading.style.display = "none";
+        }
     }
 }
 
-document.addEventListener(
-    "DOMContentLoaded",
-    muatDaftarBuku
-);
+
+// Memperbarui jumlah data buku yang sedang ditampilkan
+function updateTableCounter(table) {
+    const counter = document.getElementById("table-counter");
+
+    if (!counter || !table) return;
+
+    const rows = table.querySelectorAll("tbody tr");
+
+    const visibleRows = Array.from(rows).filter(function (row) {
+        return row.style.display !== "none";
+    });
+
+    counter.textContent =
+        "Menampilkan " +
+        visibleRows.length +
+        " dari " +
+        rows.length +
+        " buku";
+}
+
+
+// Filter daftar buku berdasarkan judul
+function initTableFilter() {
+    const input = document.getElementById("search-input");
+    const table = document.querySelector(".table-responsive table");
+
+    if (!input || !table) return;
+
+    input.addEventListener("keyup", function () {
+        const keyword = input.value.toLowerCase();
+
+        const rows = table.querySelectorAll("tbody tr");
+
+        rows.forEach(function (row) {
+            const judul = row.querySelector("td");
+
+            if (!judul) return;
+
+            const teksJudul = judul.textContent.toLowerCase();
+
+            row.style.display =
+                teksJudul.includes(keyword)
+                    ? ""
+                    : "none";
+        });
+
+        updateTableCounter(table);
+    });
+
+    updateTableCounter(table);
+}
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    muatDaftarBuku();
+    initTableFilter();
+});
