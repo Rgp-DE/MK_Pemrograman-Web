@@ -9,15 +9,43 @@ function initNavToggle() {
     });
 }
 
+// ===== Update counter di atas tabel =====
+function updateTableCounter(table) {
+    const counter = document.getElementById("table-counter");
+    if (!counter || !table) return;
+
+    const rows = table.querySelectorAll("tbody tr");
+    const visibleRows = Array.from(rows).filter(function (row) {
+        return row.style.display !== "none";
+    });
+
+    counter.textContent =
+        "Menampilkan " +
+        visibleRows.length +
+        " dari " +
+        rows.length +
+        " buku";
+}
+
 // ===== Konfirmasi hapus (front-end only, belum ke server) =====
 function initHapusConfirm() {
     document.querySelectorAll(".btn-hapus").forEach(function (btn) {
         btn.addEventListener("click", function () {
             const row = btn.closest("tr");
-            const nama = row ? row.querySelector("td")?.textContent : "data ini";
-            const yakin = confirm("Yakin ingin menghapus \"" + nama + "\"?");
+            const nama = row
+                ? row.querySelector("td")?.textContent
+                : "data ini";
+
+            const yakin = confirm(
+                "Yakin ingin menghapus \"" + nama + "\"?"
+            );
+
             if (yakin && row) {
+                const table = row.closest("table");
+
                 row.remove();
+
+                updateTableCounter(table);
             }
         });
     });
@@ -42,7 +70,11 @@ function initTableFilter() {
 
             row.style.display = teksJudul.includes(keyword) ? "" : "none";
         });
+
+        updateTableCounter(table);
     });
+
+    updateTableCounter(table);
 }
 
 // ===== Validasi form (client-side) =====

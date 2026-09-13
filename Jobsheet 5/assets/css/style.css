@@ -251,6 +251,16 @@ td button.btn-hapus {
     font-size: 1rem;
 }
 
+/* ===== Counter Tabel ===== */
+.table-counter {
+    margin-bottom: 0.75rem;
+
+    color: #55677a;
+
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
 
 /* ===== Form ===== */
 form p {
