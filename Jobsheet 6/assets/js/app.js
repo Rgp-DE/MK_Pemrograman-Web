@@ -29,25 +29,36 @@ function updateTableCounter(table) {
 
 // ===== Konfirmasi hapus (front-end only, belum ke server) =====
 function initHapusConfirm() {
-    document.querySelectorAll(".btn-hapus").forEach(function (btn) {
-        btn.addEventListener("click", function () {
-            const row = btn.closest("tr");
-            const nama = row
-                ? row.querySelector("td")?.textContent
-                : "data ini";
+    console.log("initHapusConfirm aktif");
 
-            const yakin = confirm(
-                "Yakin ingin menghapus \"" + nama + "\"?"
-            );
+    document.addEventListener("click", function (e) {
 
-            if (yakin && row) {
-                const table = row.closest("table");
+        console.log("CLICK:", e.target);
 
-                row.remove();
+        const btn = e.target.closest(".btn-hapus");
 
+        console.log("BTN HAPUS:", btn);
+
+        if (!btn) return;
+
+        const row = btn.closest("tr");
+        const nama = row
+            ? row.querySelector("td")?.textContent
+            : "data ini";
+
+        const yakin = confirm(
+            "Yakin ingin menghapus \"" + nama + "\"?"
+        );
+
+        if (yakin && row) {
+            const table = row.closest("table");
+
+            row.remove();
+
+            if (typeof updateTableCounter === "function") {
                 updateTableCounter(table);
             }
-        });
+        }
     });
 }
 
