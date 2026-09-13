@@ -23,7 +23,7 @@ function initHapusConfirm() {
     });
 }
 
-// ===== Filter/pencarian tabel real-time =====
+// ===== Filter/pencarian tabel berdasarkan kolom Judul =====
 function initTableFilter() {
     const input = document.getElementById("search-input");
     const table = document.querySelector(".table-responsive table");
@@ -34,8 +34,13 @@ function initTableFilter() {
         const rows = table.querySelectorAll("tbody tr");
 
         rows.forEach(function (row) {
-            const teks = row.textContent.toLowerCase();
-            row.style.display = teks.includes(keyword) ? "" : "none";
+            const judul = row.querySelector("td");
+
+            if (!judul) return;
+
+            const teksJudul = judul.textContent.toLowerCase();
+
+            row.style.display = teksJudul.includes(keyword) ? "" : "none";
         });
     });
 }
