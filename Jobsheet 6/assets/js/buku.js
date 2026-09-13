@@ -117,7 +117,20 @@ function initTableFilter() {
 }
 
 
+// Tombol untuk memuat ulang daftar buku
+function initMuatUlang() {
+    const button = document.getElementById("btn-muat-ulang");
+
+    if (!button) return;
+
+    button.addEventListener("click", function () {
+        muatDaftarBuku();
+    });
+}
+
+
 document.addEventListener("DOMContentLoaded", function () {
     muatDaftarBuku();
     initTableFilter();
+    initMuatUlang();
 });
