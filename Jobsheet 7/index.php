@@ -40,6 +40,24 @@ $totalAnggota = count($_SESSION['anggota'] ?? []);
 </section>
 
 <section>
+    <h2>Reset Data</h2>
+
+    <p>
+        Gunakan tombol berikut untuk menghapus seluruh data
+        yang tersimpan di session.
+    </p>
+
+    <p>
+        <a
+            href="reset_session.php"
+            class="btn-reset"
+            onclick="return confirm('Yakin ingin menghapus seluruh data session?');">
+            Reset Data
+        </a>
+    </p>
+</section>
+
+<section>
     <h2>Contoh Blok Kode</h2>
 
     <div class="code-responsive">

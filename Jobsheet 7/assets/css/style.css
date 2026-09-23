@@ -366,6 +366,22 @@ form button[type="submit"]:hover {
     border: 1px solid #f1aeb5;
 }
 
+/* ===== Tombol Reset Data ===== */
+.btn-reset {
+    display: inline-block;
+    background-color: #d9534f;
+    color: #fff;
+    padding: 0.6rem 1.5rem;
+    border-radius: 4px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.btn-reset:hover {
+    background-color: #c9302c;
+    text-decoration: none;
+}
 
 /* ===== Halaman Login ===== */
 .login-main {
