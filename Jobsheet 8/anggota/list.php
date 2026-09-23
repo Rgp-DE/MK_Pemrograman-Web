@@ -1,6 +1,6 @@
 <?php
 
-$page_title = "Daftar Anggota";
+$page_title = "Daftar Buku";
 
 require_once __DIR__ . '/../includes/koneksi.php';
 
@@ -10,24 +10,26 @@ include __DIR__ . '/../includes/header.php';
 $flash = $_SESSION['flash'] ?? null;
 unset($_SESSION['flash']);
 
-/* ===== Ambil data anggota dari PostgreSQL ===== */
-$daftarAnggota = $pdo
+/* ===== Ambil data buku dari PostgreSQL ===== */
+$daftarBuku = $pdo
     ->query("
         SELECT
             id,
-            no_anggota,
-            nama,
-            alamat,
-            no_hp,
-            email
-        FROM anggota
+            judul,
+            pengarang,
+            tahun,
+            isbn,
+            stok,
+            kategori,
+            tanggal_ditambahkan
+        FROM buku
         ORDER BY id DESC
     ")
     ->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <section>
-    <h2>Daftar Anggota</h2>
+    <h2>Daftar Buku</h2>
 
     <?php if ($flash): ?>
         <p class="flash flash-<?php echo htmlspecialchars($flash['type']); ?>">
@@ -36,56 +38,57 @@ $daftarAnggota = $pdo
     <?php endif; ?>
 
     <p id="table-counter" class="table-counter">
-        Menampilkan <?php echo count($daftarAnggota); ?>
-        dari <?php echo count($daftarAnggota); ?> anggota
+        Menampilkan <?php echo count($daftarBuku); ?>
+        dari <?php echo count($daftarBuku); ?> buku
     </p>
 
     <div class="search-box">
         <label for="search-input">
-            Cari Nama Anggota
+            Cari Judul Buku
         </label>
 
         <input
             type="text"
             id="search-input"
-            placeholder="Ketik nama anggota...">
+            placeholder="Ketik judul buku...">
     </div>
 
     <div class="table-responsive">
         <table>
             <thead>
                 <tr>
-                    <th>No. Anggota</th>
-                    <th>Nama</th>
-                    <th>Alamat</th>
-                    <th>No. HP</th>
-                    <th>Email</th>
+                    <th>Judul</th>
+                    <th>Pengarang</th>
+                    <th>Tahun</th>
+                    <th>Stok</th>
+                    <th>Kategori</th>
+                    <th>Tanggal Ditambahkan</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
 
             <tbody>
 
-                <?php if (empty($daftarAnggota)): ?>
+                <?php if (empty($daftarBuku)): ?>
 
                     <tr>
-                        <td colspan="6">
-                            Belum ada data anggota.
+                        <td colspan="7">
+                            Belum ada data buku.
                             Silakan tambah lewat menu
-                            "Tambah Anggota".
+                            "Tambah Buku".
                         </td>
                     </tr>
 
                 <?php else: ?>
 
-                    <?php foreach ($daftarAnggota as $anggota): ?>
+                    <?php foreach ($daftarBuku as $buku): ?>
 
                         <tr>
 
                             <td>
                                 <?php
                                 echo htmlspecialchars(
-                                    $anggota['no_anggota'] ?? ''
+                                    $buku['judul'] ?? ''
                                 );
                                 ?>
                             </td>
@@ -93,7 +96,7 @@ $daftarAnggota = $pdo
                             <td>
                                 <?php
                                 echo htmlspecialchars(
-                                    $anggota['nama'] ?? ''
+                                    $buku['pengarang'] ?? ''
                                 );
                                 ?>
                             </td>
@@ -101,7 +104,7 @@ $daftarAnggota = $pdo
                             <td>
                                 <?php
                                 echo htmlspecialchars(
-                                    $anggota['alamat'] ?? ''
+                                    $buku['tahun'] ?? ''
                                 );
                                 ?>
                             </td>
@@ -109,7 +112,7 @@ $daftarAnggota = $pdo
                             <td>
                                 <?php
                                 echo htmlspecialchars(
-                                    $anggota['no_hp'] ?? ''
+                                    $buku['stok'] ?? ''
                                 );
                                 ?>
                             </td>
@@ -117,7 +120,15 @@ $daftarAnggota = $pdo
                             <td>
                                 <?php
                                 echo htmlspecialchars(
-                                    $anggota['email'] ?? ''
+                                    $buku['kategori'] ?? ''
+                                );
+                                ?>
+                            </td>
+
+                            <td>
+                                <?php
+                                echo htmlspecialchars(
+                                    $buku['tanggal_ditambahkan'] ?? ''
                                 );
                                 ?>
                             </td>
@@ -127,6 +138,12 @@ $daftarAnggota = $pdo
                                     type="button"
                                     class="btn-edit">
                                     Edit
+                                </button>
+
+                                <button
+                                    type="button"
+                                    class="btn-detail">
+                                    Detail
                                 </button>
 
                                 <button
