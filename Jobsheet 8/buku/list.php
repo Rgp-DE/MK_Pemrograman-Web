@@ -9,8 +9,14 @@ include __DIR__ . '/../includes/header.php';
 $flash = $_SESSION['flash'] ?? null;
 unset($_SESSION['flash']);
 
-$daftarBuku = $pdo
-    ->query("
+$keyword = trim($_GET['keyword'] ?? '');
+
+$totalBuku = $pdo
+    ->query("SELECT COUNT(*) FROM buku")
+    ->fetchColumn();
+
+if ($keyword !== '') {
+    $stmt = $pdo->prepare("
         SELECT
             id,
             judul,
@@ -21,9 +27,32 @@ $daftarBuku = $pdo
             kategori,
             tanggal_ditambahkan
         FROM buku
+        WHERE judul ILIKE :keyword
         ORDER BY id DESC
-    ")
-    ->fetchAll(PDO::FETCH_ASSOC);
+    ");
+
+    $stmt->execute([
+        'keyword' => '%' . $keyword . '%'
+    ]);
+
+    $daftarBuku = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} else {
+    $daftarBuku = $pdo
+        ->query("
+            SELECT
+                id,
+                judul,
+                pengarang,
+                tahun,
+                isbn,
+                stok,
+                kategori,
+                tanggal_ditambahkan
+            FROM buku
+            ORDER BY id DESC
+        ")
+        ->fetchAll(PDO::FETCH_ASSOC);
+}
 ?>
 
 <section>
@@ -37,18 +66,35 @@ $daftarBuku = $pdo
 
     <p id="table-counter" class="table-counter">
         Menampilkan <?php echo count($daftarBuku); ?>
-        dari <?php echo count($daftarBuku); ?> buku
+        dari <?php echo $totalBuku; ?> buku
     </p>
 
     <div class="search-box">
-        <label for="search-input">
-            Cari Judul Buku
-        </label>
+        <form method="get" action="list.php">
 
-        <input
-            type="text"
-            id="search-input"
-            placeholder="Ketik judul buku...">
+            <label for="search-input">
+                Cari Judul Buku
+            </label>
+
+            <input
+                type="text"
+                id="search-input"
+                name="keyword"
+                data-server-search="true"
+                value="<?php echo htmlspecialchars($keyword); ?>"
+                placeholder="Ketik judul buku...">
+
+            <button type="submit">
+                Cari
+            </button>
+
+            <?php if ($keyword !== ''): ?>
+                <a href="list.php">
+                    Reset
+                </a>
+            <?php endif; ?>
+
+        </form>
     </div>
 
     <div class="table-responsive">
@@ -71,9 +117,19 @@ $daftarBuku = $pdo
 
                     <tr>
                         <td colspan="7">
-                            Belum ada data buku.
-                            Silakan tambah lewat menu
-                            "Tambah Buku".
+                            <?php if ($keyword !== ''): ?>
+
+                                Buku dengan judul
+                                "<?php echo htmlspecialchars($keyword); ?>"
+                                tidak ditemukan.
+
+                            <?php else: ?>
+
+                                Belum ada data buku.
+                                Silakan tambah lewat menu
+                                "Tambah Buku".
+
+                            <?php endif; ?>
                         </td>
                     </tr>
 

@@ -1,4 +1,14 @@
-// ===== Hamburger menu (JS-driven) =====
+document.addEventListener("DOMContentLoaded", function () {
+    initNavToggle();
+    initHapusConfirm();
+    initTableFilter();
+    initValidasiForm();
+});
+
+/* =========================
+   NAVBAR HAMBURGER
+========================= */
+
 function initNavToggle() {
     const toggleBtn = document.getElementById("nav-toggle-btn");
     const nav = document.querySelector("header nav");
@@ -7,47 +17,23 @@ function initNavToggle() {
 
     toggleBtn.addEventListener("click", function () {
         nav.classList.toggle("nav-open");
+
+        const isOpen = nav.classList.contains("nav-open");
+
+        toggleBtn.setAttribute(
+            "aria-label",
+            isOpen ? "Tutup menu" : "Buka menu"
+        );
     });
 }
 
 
-// ===== Update counter di atas tabel =====
-function updateTableCounter(table) {
-    const counter = document.getElementById("table-counter");
+/* =========================
+   HAPUS DATA - CONFIRM
+========================= */
 
-    if (!counter || !table) return;
-
-    const rows = table.querySelectorAll("tbody tr");
-
-    const visibleRows = Array.from(rows).filter(function (row) {
-        return row.style.display !== "none";
-    });
-
-    const heading = document.querySelector("h2");
-
-    let jenisData = "buku";
-
-    if (
-        heading &&
-        heading.textContent.trim() === "Daftar Anggota"
-    ) {
-        jenisData = "anggota";
-    }
-
-    counter.textContent =
-        "Menampilkan " +
-        visibleRows.length +
-        " dari " +
-        rows.length +
-        " " +
-        jenisData;
-}
-
-
-// ===== Konfirmasi hapus (front-end only) =====
 function initHapusConfirm() {
     document.addEventListener("click", function (e) {
-
         const btn = e.target.closest(".btn-hapus");
 
         if (!btn) return;
@@ -67,132 +53,133 @@ function initHapusConfirm() {
 
             row.remove();
 
-            updateTableCounter(table);
+            if (typeof updateTableCounter === "function") {
+                updateTableCounter(table);
+            }
         }
     });
 }
 
 
-// ===== Filter / pencarian tabel =====
+/* =========================
+   FILTER TABEL
+========================= */
+
 function initTableFilter() {
     const input = document.getElementById("search-input");
-    const table = document.querySelector(
-        ".table-responsive table"
-    );
+    const table = document.querySelector("table");
 
     if (!input || !table) return;
 
-    input.addEventListener("keyup", function () {
+    /*
+     * Pada Jobsheet 8 buku/list.php,
+     * pencarian sudah dilakukan di server
+     * menggunakan PostgreSQL ILIKE.
+     *
+     * Karena itu JavaScript tidak perlu
+     * melakukan filter lagi.
+     */
+    if (input.dataset.serverSearch === "true") {
+        return;
+    }
 
+    input.addEventListener("input", function () {
         const keyword = input.value
-            .toLowerCase()
-            .trim();
+            .trim()
+            .toLowerCase();
 
-        const rows = table.querySelectorAll("tbody tr");
-
-        const heading = document.querySelector("h2");
-
-        let kolomPencarian = 0;
-
-        /*
-         * Daftar Buku:
-         * Judul berada di kolom pertama.
-         */
-        if (
-            heading &&
-            heading.textContent.trim() === "Daftar Buku"
-        ) {
-            kolomPencarian = 0;
-        }
-
-        /*
-         * Daftar Anggota:
-         * Nama berada di kolom kedua.
-         */
-        if (
-            heading &&
-            heading.textContent.trim() === "Daftar Anggota"
-        ) {
-            kolomPencarian = 1;
-        }
+        const rows = table.querySelectorAll(
+            "tbody tr"
+        );
 
         rows.forEach(function (row) {
+            const judul = row.querySelector("td");
 
-            const cells = row.querySelectorAll("td");
+            if (!judul) return;
 
-            if (!cells[kolomPencarian]) return;
-
-            const teksPencarian =
-                cells[kolomPencarian]
-                    .textContent
-                    .toLowerCase();
+            const teksJudul =
+                judul.textContent.toLowerCase();
 
             row.style.display =
-                teksPencarian.includes(keyword)
+                teksJudul.includes(keyword)
                     ? ""
                     : "none";
         });
 
         updateTableCounter(table);
     });
-
-    updateTableCounter(table);
 }
 
 
-// ===== Menampilkan error validasi =====
-function tampilkanError(input, pesan) {
-    hapusError(input);
+/* =========================
+   COUNTER TABEL
+========================= */
 
-    const span = document.createElement("span");
+function updateTableCounter(table) {
+    const counter =
+        document.getElementById("table-counter");
 
-    span.className = "error";
+    if (!counter || !table) return;
 
-    span.textContent = pesan;
-
-    input.insertAdjacentElement(
-        "afterend",
-        span
+    const rows = table.querySelectorAll(
+        "tbody tr"
     );
-}
 
+    const visibleRows =
+        Array.from(rows).filter(function (row) {
+            return row.style.display !== "none";
+        });
 
-// ===== Menghapus error validasi =====
-function hapusError(input) {
-    const next = input.nextElementSibling;
+    /*
+     * Untuk server-side search, jumlah hasil
+     * sudah ditentukan oleh PHP.
+     *
+     * JavaScript tidak mengubah counter.
+     */
+    const searchInput =
+        document.getElementById("search-input");
 
     if (
-        next &&
-        next.classList.contains("error")
+        searchInput &&
+        searchInput.dataset.serverSearch === "true"
     ) {
-        next.remove();
+        return;
     }
+
+    const totalRows = rows.length;
+
+    counter.textContent =
+        "Menampilkan " +
+        visibleRows.length +
+        " dari " +
+        totalRows +
+        " buku";
 }
 
 
-// ===== Validasi form client-side =====
-function initValidasiForm() {
+/* =========================
+   VALIDASI FORM
+========================= */
 
-    const form = document.getElementById("form-tambah");
+function initValidasiForm() {
+    const form =
+        document.querySelector("form");
 
     if (!form) return;
 
     form.addEventListener("submit", function (e) {
-
         let valid = true;
 
-
-        // ===== Field wajib =====
+        /*
+         * Field wajib
+         */
         const fieldWajib = [
             "judul",
             "nama",
-            "pengarang",
-            "no_anggota",
-            "email"
+            "pengarang"
         ];
 
         fieldWajib.forEach(function (namaField) {
-
             const input = form.querySelector(
                 "[name='" + namaField + "']"
             );
@@ -200,141 +187,110 @@ function initValidasiForm() {
             if (!input) return;
 
             if (input.value.trim() === "") {
-
                 tampilkanError(
                     input,
                     "Field ini wajib diisi."
                 );
 
                 valid = false;
-
             } else {
-
                 hapusError(input);
             }
         });
 
 
-        // ===== Validasi Tahun =====
+        /*
+         * Validasi tahun
+         */
         const tahun = form.querySelector(
             "[name='tahun']"
         );
 
         if (tahun) {
-
-            const nilai = parseInt(
-                tahun.value,
-                10
-            );
+            const nilaiTahun =
+                parseInt(tahun.value, 10);
 
             if (
-                isNaN(nilai) ||
-                nilai < 1900 ||
-                nilai > 2026
+                tahun.value.trim() !== "" &&
+                (
+                    isNaN(nilaiTahun) ||
+                    nilaiTahun < 1900 ||
+                    nilaiTahun > 2026
+                )
             ) {
-
                 tampilkanError(
                     tahun,
                     "Tahun harus di antara 1900-2026."
                 );
 
                 valid = false;
-
             } else {
-
                 hapusError(tahun);
             }
         }
 
 
-        // ===== Validasi Stok =====
+        /*
+         * Validasi stok
+         */
         const stok = form.querySelector(
             "[name='stok']"
         );
 
         if (stok) {
-
-            const nilai = parseInt(
-                stok.value,
-                10
-            );
+            const nilaiStok =
+                parseInt(stok.value, 10);
 
             if (
-                isNaN(nilai) ||
-                nilai < 0
+                stok.value.trim() !== "" &&
+                (
+                    isNaN(nilaiStok) ||
+                    nilaiStok < 0
+                )
             ) {
-
                 tampilkanError(
                     stok,
                     "Stok tidak boleh negatif."
                 );
 
                 valid = false;
-
             } else {
-
                 hapusError(stok);
             }
         }
 
 
-        // ===== Validasi ISBN =====
+        /*
+         * Validasi ISBN
+         */
         const isbn = form.querySelector(
             "[name='isbn']"
         );
 
         if (isbn) {
-
-            const nilai = isbn.value.trim();
+            const nilai =
+                isbn.value.trim();
 
             if (
                 nilai !== "" &&
                 !/^[0-9-]+$/.test(nilai)
             ) {
-
                 tampilkanError(
                     isbn,
                     "ISBN hanya boleh berisi angka dan tanda hubung (-)."
                 );
 
                 valid = false;
-
             } else {
-
                 hapusError(isbn);
             }
         }
 
 
-        // ===== Validasi Email =====
-        const email = form.querySelector(
-            "[name='email']"
-        );
-
-        if (email) {
-
-            const nilai = email.value.trim();
-
-            if (
-                nilai !== "" &&
-                !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(nilai)
-            ) {
-
-                tampilkanError(
-                    email,
-                    "Format email tidak valid."
-                );
-
-                valid = false;
-
-            } else {
-
-                hapusError(email);
-            }
-        }
-
-
-        // ===== Hentikan submit jika tidak valid =====
+        /*
+         * Jika validasi gagal,
+         * cegah form dikirim.
+         */
         if (!valid) {
             e.preventDefault();
         }
@@ -342,17 +298,46 @@ function initValidasiForm() {
 }
 
 
-// ===== Jalankan semua fungsi saat halaman siap =====
-document.addEventListener(
-    "DOMContentLoaded",
-    function () {
+/* =========================
+   TAMPILKAN ERROR
+========================= */
 
-        initNavToggle();
+function tampilkanError(input, pesan) {
+    hapusError(input);
 
-        initHapusConfirm();
+    input.classList.add("input-error");
 
-        initTableFilter();
+    const error = document.createElement("small");
 
-        initValidasiForm();
+    error.className = "error-message";
+
+    error.textContent = pesan;
+
+    input.insertAdjacentElement(
+        "afterend",
+        error
+    );
+}
+
+
+/* =========================
+   HAPUS ERROR
+========================= */
+
+function hapusError(input) {
+    input.classList.remove(
+        "input-error"
+    );
+
+    const error =
+        input.nextElementSibling;
+
+    if (
+        error &&
+        error.classList.contains(
+            "error-message"
+        )
+    ) {
+        error.remove();
     }
-);
+}
