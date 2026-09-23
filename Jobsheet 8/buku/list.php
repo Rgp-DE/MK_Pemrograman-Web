@@ -6,11 +6,9 @@ require_once __DIR__ . '/../includes/koneksi.php';
 
 include __DIR__ . '/../includes/header.php';
 
-/* ===== Ambil flash message ===== */
 $flash = $_SESSION['flash'] ?? null;
 unset($_SESSION['flash']);
 
-/* ===== Ambil data buku dari PostgreSQL ===== */
 $daftarBuku = $pdo
     ->query("
         SELECT
@@ -20,7 +18,8 @@ $daftarBuku = $pdo
             tahun,
             isbn,
             stok,
-            kategori
+            kategori,
+            tanggal_ditambahkan
         FROM buku
         ORDER BY id DESC
     ")
@@ -42,7 +41,9 @@ $daftarBuku = $pdo
     </p>
 
     <div class="search-box">
-        <label for="search-input">Cari Judul Buku</label>
+        <label for="search-input">
+            Cari Judul Buku
+        </label>
 
         <input
             type="text"
@@ -59,6 +60,7 @@ $daftarBuku = $pdo
                     <th>Tahun</th>
                     <th>Stok</th>
                     <th>Kategori</th>
+                    <th>Tanggal Ditambahkan</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
@@ -68,7 +70,7 @@ $daftarBuku = $pdo
                 <?php if (empty($daftarBuku)): ?>
 
                     <tr>
-                        <td colspan="6">
+                        <td colspan="7">
                             Belum ada data buku.
                             Silakan tambah lewat menu
                             "Tambah Buku".
@@ -117,6 +119,14 @@ $daftarBuku = $pdo
                                 <?php
                                 echo htmlspecialchars(
                                     $buku['kategori'] ?? ''
+                                );
+                                ?>
+                            </td>
+
+                            <td>
+                                <?php
+                                echo htmlspecialchars(
+                                    $buku['tanggal_ditambahkan'] ?? ''
                                 );
                                 ?>
                             </td>
