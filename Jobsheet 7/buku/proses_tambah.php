@@ -2,6 +2,7 @@
 
 session_start();
 
+/* ===== Ambil data dari form ===== */
 $judul = trim($_POST['judul'] ?? '');
 $pengarang = trim($_POST['pengarang'] ?? '');
 $tahun = $_POST['tahun'] ?? '';
@@ -9,25 +10,20 @@ $isbn = trim($_POST['isbn'] ?? '');
 $stok = $_POST['stok'] ?? '';
 $kategori = trim($_POST['kategori'] ?? '');
 
+/* ===== Menampung pesan error ===== */
 $errors = [];
 
-/*
- * Validasi Judul
- */
+/* ===== Validasi Judul ===== */
 if ($judul === '') {
     $errors[] = "Judul wajib diisi.";
 }
 
-/*
- * Validasi Pengarang
- */
+/* ===== Validasi Pengarang ===== */
 if ($pengarang === '') {
     $errors[] = "Pengarang wajib diisi.";
 }
 
-/*
- * Validasi Tahun
- */
+/* ===== Validasi Tahun ===== */
 if (
     !is_numeric($tahun) ||
     $tahun < 1900 ||
@@ -36,9 +32,7 @@ if (
     $errors[] = "Tahun harus di antara 1900-2026.";
 }
 
-/*
- * Validasi Stok
- */
+/* ===== Validasi Stok ===== */
 if (
     !is_numeric($stok) ||
     $stok < 0
@@ -46,11 +40,7 @@ if (
     $errors[] = "Stok tidak boleh negatif.";
 }
 
-/*
- * Validasi ISBN
- * ISBN boleh kosong.
- * Jika diisi, hanya boleh angka dan tanda hubung.
- */
+/* ===== Validasi ISBN ===== */
 if (
     $isbn !== '' &&
     !preg_match('/^[0-9-]+$/', $isbn)
@@ -59,9 +49,7 @@ if (
         "ISBN hanya boleh berisi angka dan tanda hubung (-).";
 }
 
-/*
- * Validasi Kategori
- */
+/* ===== Validasi Kategori ===== */
 $kategoriValid = [
     'fiksi',
     'non-fiksi',
@@ -72,9 +60,7 @@ if (!in_array($kategori, $kategoriValid, true)) {
     $errors[] = "Kategori tidak valid.";
 }
 
-/*
- * Jika terdapat error
- */
+/* ===== Jika terdapat error ===== */
 if (!empty($errors)) {
 
     $_SESSION['flash'] = [
@@ -86,16 +72,12 @@ if (!empty($errors)) {
     exit;
 }
 
-/*
- * Membuat array buku jika belum tersedia
- */
+/* ===== Siapkan session buku ===== */
 if (!isset($_SESSION['buku'])) {
     $_SESSION['buku'] = [];
 }
 
-/*
- * Menambahkan data buku ke Session
- */
+/* ===== Simpan data buku ===== */
 $_SESSION['buku'][] = [
     'judul' => $judul,
     'pengarang' => $pengarang,
@@ -105,16 +87,12 @@ $_SESSION['buku'][] = [
     'kategori' => $kategori
 ];
 
-/*
- * Flash message berhasil
- */
+/* ===== Pesan berhasil ===== */
 $_SESSION['flash'] = [
     'type' => 'success',
     'pesan' => 'Buku berhasil ditambahkan.'
 ];
 
-/*
- * Kembali ke daftar buku
- */
+/* ===== Kembali ke daftar buku ===== */
 header('Location: list.php');
 exit;
