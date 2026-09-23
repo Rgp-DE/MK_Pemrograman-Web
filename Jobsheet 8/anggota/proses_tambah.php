@@ -43,7 +43,7 @@ if (
         "No. HP hanya boleh berisi angka, spasi, tanda plus (+), dan tanda hubung (-).";
 }
 
-/* ===== Jika terdapat error ===== */
+/* ===== Jika terdapat error validasi ===== */
 if (!empty($errors)) {
 
     $_SESSION['flash'] = [
@@ -90,10 +90,30 @@ try {
 
 } catch (PDOException $e) {
 
-    $_SESSION['flash'] = [
-        'type' => 'error',
-        'pesan' => 'Anggota gagal ditambahkan ke database.'
-    ];
+    /*
+     * SQLSTATE 23505 = unique_violation
+     * Digunakan untuk menangani no_anggota
+     * yang sudah digunakan.
+     */
+    if (
+        isset($e->errorInfo[0]) &&
+        $e->errorInfo[0] === '23505'
+    ) {
+
+        $_SESSION['flash'] = [
+            'type' => 'error',
+            'pesan' =>
+                'No. Anggota sudah dipakai, gunakan nomor lain.'
+        ];
+
+    } else {
+
+        $_SESSION['flash'] = [
+            'type' => 'error',
+            'pesan' =>
+                'Terjadi kesalahan saat menyimpan data anggota.'
+        ];
+    }
 }
 
 /* ===== Kembali ke daftar anggota ===== */
