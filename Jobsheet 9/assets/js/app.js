@@ -1,15 +1,12 @@
 document.addEventListener("DOMContentLoaded", function () {
     initNavToggle();
     initHapusConfirm();
+    initUpdateConfirm();
     initTableFilter();
     initValidasiForm();
 });
 
-
-/* =========================
-   NAVBAR HAMBURGER
-========================= */
-
+/* NAVBAR HAMBURGER */
 function initNavToggle() {
     const toggleBtn =
         document.getElementById("nav-toggle-btn");
@@ -34,16 +31,11 @@ function initNavToggle() {
     });
 }
 
-
-/* =========================
-   HAPUS DATA - CONFIRM
-========================= */
-
+/* HAPUS DATA - CONFIRM */
 function initHapusConfirm() {
     document.addEventListener(
         "submit",
         function (e) {
-
             const form =
                 e.target.closest(".form-hapus");
 
@@ -55,7 +47,6 @@ function initHapusConfirm() {
             let nama = "data ini";
 
             if (row) {
-
                 const firstCell =
                     row.querySelector("td");
 
@@ -72,20 +63,35 @@ function initHapusConfirm() {
             );
 
             if (!yakin) {
-
                 e.preventDefault();
             }
         }
     );
 }
 
+/* UPDATE DATA - CONFIRM */
+function initUpdateConfirm() {
+    const formEdit =
+        document.getElementById("form-edit");
 
-/* =========================
-   FILTER TABEL
-========================= */
+    if (!formEdit) return;
 
+    formEdit.addEventListener(
+        "submit",
+        function (e) {
+            const yakin = confirm(
+                "Yakin ingin menyimpan perubahan data?"
+            );
+
+            if (!yakin) {
+                e.preventDefault();
+            }
+        }
+    );
+}
+
+/* FILTER TABEL */
 function initTableFilter() {
-
     const input =
         document.getElementById("search-input");
 
@@ -94,11 +100,6 @@ function initTableFilter() {
 
     if (!input || !table) return;
 
-    /*
-     * Jika pencarian dilakukan oleh server,
-     * JavaScript tidak melakukan filter
-     * terhadap baris tabel.
-     */
     if (
         input.dataset.serverSearch === "true"
     ) {
@@ -108,7 +109,6 @@ function initTableFilter() {
     input.addEventListener(
         "input",
         function () {
-
             const keyword =
                 input.value
                     .trim()
@@ -120,7 +120,6 @@ function initTableFilter() {
                 );
 
             rows.forEach(function (row) {
-
                 const firstCell =
                     row.querySelector("td");
 
@@ -141,13 +140,8 @@ function initTableFilter() {
     );
 }
 
-
-/* =========================
-   COUNTER TABEL
-========================= */
-
+/* COUNTER TABEL */
 function updateTableCounter(table) {
-
     const counter =
         document.getElementById(
             "table-counter"
@@ -160,10 +154,6 @@ function updateTableCounter(table) {
             "search-input"
         );
 
-    /*
-     * Pada server-side search,
-     * counter sudah dihitung oleh PHP.
-     */
     if (
         searchInput &&
         searchInput.dataset.serverSearch === "true"
@@ -194,13 +184,8 @@ function updateTableCounter(table) {
         " data";
 }
 
-
-/* =========================
-   VALIDASI FORM
-========================= */
-
+/* VALIDASI FORM */
 function initValidasiForm() {
-
     const forms =
         document.querySelectorAll(
             "form"
@@ -209,11 +194,6 @@ function initValidasiForm() {
     if (!forms.length) return;
 
     forms.forEach(function (form) {
-
-        /*
-         * Jangan pasang validasi pada
-         * form pencarian dan form hapus.
-         */
         if (
             form.classList.contains(
                 "form-hapus"
@@ -233,17 +213,11 @@ function initValidasiForm() {
                 "[name='pengarang']"
             )
         ) {
-
             form.addEventListener(
                 "submit",
                 function (e) {
-
                     let valid = true;
 
-
-                    /*
-                     * Field wajib
-                     */
                     const fieldWajib = [
                         "judul",
                         "nama",
@@ -252,7 +226,6 @@ function initValidasiForm() {
 
                     fieldWajib.forEach(
                         function (namaField) {
-
                             const input =
                                 form.querySelector(
                                     "[name='" +
@@ -266,34 +239,24 @@ function initValidasiForm() {
                                 input.value
                                     .trim() === ""
                             ) {
-
                                 tampilkanError(
                                     input,
                                     "Field ini wajib diisi."
                                 );
 
                                 valid = false;
-
                             } else {
-
-                                hapusError(
-                                    input
-                                );
+                                hapusError(input);
                             }
                         }
                     );
 
-
-                    /*
-                     * Validasi tahun
-                     */
                     const tahun =
                         form.querySelector(
                             "[name='tahun']"
                         );
 
                     if (tahun) {
-
                         const nilaiTahun =
                             parseInt(
                                 tahun.value,
@@ -308,31 +271,23 @@ function initValidasiForm() {
                                 nilaiTahun > 2026
                             )
                         ) {
-
                             tampilkanError(
                                 tahun,
                                 "Tahun harus di antara 1900-2026."
                             );
 
                             valid = false;
-
                         } else {
-
                             hapusError(tahun);
                         }
                     }
 
-
-                    /*
-                     * Validasi stok
-                     */
                     const stok =
                         form.querySelector(
                             "[name='stok']"
                         );
 
                     if (stok) {
-
                         const nilaiStok =
                             parseInt(
                                 stok.value,
@@ -346,31 +301,23 @@ function initValidasiForm() {
                                 nilaiStok < 0
                             )
                         ) {
-
                             tampilkanError(
                                 stok,
                                 "Stok tidak boleh negatif."
                             );
 
                             valid = false;
-
                         } else {
-
                             hapusError(stok);
                         }
                     }
 
-
-                    /*
-                     * Validasi ISBN
-                     */
                     const isbn =
                         form.querySelector(
                             "[name='isbn']"
                         );
 
                     if (isbn) {
-
                         const nilai =
                             isbn.value.trim();
 
@@ -380,31 +327,23 @@ function initValidasiForm() {
                                 nilai
                             )
                         ) {
-
                             tampilkanError(
                                 isbn,
                                 "ISBN hanya boleh berisi angka dan tanda hubung (-)."
                             );
 
                             valid = false;
-
                         } else {
-
                             hapusError(isbn);
                         }
                     }
 
-
-                    /*
-                     * Validasi No. Anggota
-                     */
                     const noAnggota =
                         form.querySelector(
                             "[name='no_anggota']"
                         );
 
                     if (noAnggota) {
-
                         const nilai =
                             noAnggota.value.trim();
 
@@ -414,33 +353,23 @@ function initValidasiForm() {
                                 nilai
                             )
                         ) {
-
                             tampilkanError(
                                 noAnggota,
                                 "No. Anggota hanya boleh berisi huruf, angka, dan tanda hubung (-)."
                             );
 
                             valid = false;
-
                         } else {
-
-                            hapusError(
-                                noAnggota
-                            );
+                            hapusError(noAnggota);
                         }
                     }
 
-
-                    /*
-                     * Validasi Email
-                     */
                     const email =
                         form.querySelector(
                             "[name='email']"
                         );
 
                     if (email) {
-
                         const nilai =
                             email.value.trim();
 
@@ -450,31 +379,23 @@ function initValidasiForm() {
                                 nilai
                             )
                         ) {
-
                             tampilkanError(
                                 email,
                                 "Format email tidak valid."
                             );
 
                             valid = false;
-
                         } else {
-
                             hapusError(email);
                         }
                     }
 
-
-                    /*
-                     * Validasi No. HP
-                     */
                     const noHp =
                         form.querySelector(
                             "[name='no_hp']"
                         );
 
                     if (noHp) {
-
                         const nilai =
                             noHp.value.trim();
 
@@ -484,25 +405,17 @@ function initValidasiForm() {
                                 nilai
                             )
                         ) {
-
                             tampilkanError(
                                 noHp,
                                 "No. HP hanya boleh berisi angka, spasi, tanda plus (+), dan tanda hubung (-)."
                             );
 
                             valid = false;
-
                         } else {
-
                             hapusError(noHp);
                         }
                     }
 
-
-                    /*
-                     * Jika validasi gagal,
-                     * cegah form dikirim.
-                     */
                     if (!valid) {
                         e.preventDefault();
                     }
@@ -512,16 +425,11 @@ function initValidasiForm() {
     });
 }
 
-
-/* =========================
-   TAMPILKAN ERROR
-========================= */
-
+/* TAMPILKAN ERROR */
 function tampilkanError(
     input,
     pesan
 ) {
-
     hapusError(input);
 
     input.classList.add(
@@ -545,13 +453,8 @@ function tampilkanError(
     );
 }
 
-
-/* =========================
-   HAPUS ERROR
-========================= */
-
+/* HAPUS ERROR */
 function hapusError(input) {
-
     input.classList.remove(
         "input-error"
     );
@@ -565,7 +468,6 @@ function hapusError(input) {
             "error-message"
         )
     ) {
-
         error.remove();
     }
 }
