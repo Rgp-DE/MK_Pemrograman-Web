@@ -4,18 +4,76 @@ $page_title = "Daftar Buku";
 
 require_once __DIR__ . '/../includes/koneksi.php';
 
-include __DIR__ . '/../includes/header.php';
-
-$flash = $_SESSION['flash'] ?? null;
-unset($_SESSION['flash']);
-
 $keyword = trim($_GET['keyword'] ?? '');
 
-$totalBuku = $pdo
-    ->query("SELECT COUNT(*) FROM buku")
-    ->fetchColumn();
+/*
+ * Modifikasi No.2
+ * Mengubah jumlah data per halaman dari 5 menjadi 10.
+ */
+$perPage = 10;
 
+$page = filter_input(
+    INPUT_GET,
+    'page',
+    FILTER_VALIDATE_INT
+);
+
+if (!$page || $page < 1) {
+    $page = 1;
+}
+
+/*
+ * Menghitung total data buku.
+ * Jika ada keyword, jumlah total hanya berdasarkan
+ * data yang sesuai dengan pencarian.
+ */
 if ($keyword !== '') {
+
+    $stmtCount = $pdo->prepare("
+        SELECT COUNT(*)
+        FROM buku
+        WHERE judul ILIKE :keyword
+    ");
+
+    $stmtCount->execute([
+        'keyword' => '%' . $keyword . '%'
+    ]);
+
+    $totalBuku = (int) $stmtCount->fetchColumn();
+
+} else {
+
+    $totalBuku = (int) $pdo
+        ->query("SELECT COUNT(*) FROM buku")
+        ->fetchColumn();
+}
+
+/*
+ * Menghitung jumlah halaman.
+ */
+$totalPages = max(
+    1,
+    (int) ceil($totalBuku / $perPage)
+);
+
+/*
+ * Jika page melebihi jumlah halaman,
+ * arahkan ke halaman terakhir.
+ */
+if ($page > $totalPages) {
+    $page = $totalPages;
+}
+
+/*
+ * Menghitung posisi awal data.
+ */
+$offset = ($page - 1) * $perPage;
+
+/*
+ * Mengambil data buku berdasarkan halaman.
+ */
+if ($keyword !== '') {
+
     $stmt = $pdo->prepare("
         SELECT
             id,
@@ -29,30 +87,69 @@ if ($keyword !== '') {
         FROM buku
         WHERE judul ILIKE :keyword
         ORDER BY id DESC
+        LIMIT :limit
+        OFFSET :offset
     ");
 
-    $stmt->execute([
-        'keyword' => '%' . $keyword . '%'
-    ]);
+    $stmt->bindValue(
+        ':keyword',
+        '%' . $keyword . '%',
+        PDO::PARAM_STR
+    );
 
-    $daftarBuku = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $stmt->bindValue(
+        ':limit',
+        $perPage,
+        PDO::PARAM_INT
+    );
+
+    $stmt->bindValue(
+        ':offset',
+        $offset,
+        PDO::PARAM_INT
+    );
+
+    $stmt->execute();
+
 } else {
-    $daftarBuku = $pdo
-        ->query("
-            SELECT
-                id,
-                judul,
-                pengarang,
-                tahun,
-                isbn,
-                stok,
-                kategori,
-                tanggal_ditambahkan
-            FROM buku
-            ORDER BY id DESC
-        ")
-        ->fetchAll(PDO::FETCH_ASSOC);
+
+    $stmt = $pdo->prepare("
+        SELECT
+            id,
+            judul,
+            pengarang,
+            tahun,
+            isbn,
+            stok,
+            kategori,
+            tanggal_ditambahkan
+        FROM buku
+        ORDER BY id DESC
+        LIMIT :limit
+        OFFSET :offset
+    ");
+
+    $stmt->bindValue(
+        ':limit',
+        $perPage,
+        PDO::PARAM_INT
+    );
+
+    $stmt->bindValue(
+        ':offset',
+        $offset,
+        PDO::PARAM_INT
+    );
+
+    $stmt->execute();
 }
+
+$daftarBuku = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+$flash = $_SESSION['flash'] ?? null;
+unset($_SESSION['flash']);
+
+include __DIR__ . '/../includes/header.php';
 ?>
 
 <section>
@@ -66,11 +163,6 @@ if ($keyword !== '') {
         </p>
 
     <?php endif; ?>
-
-    <p id="table-counter" class="table-counter">
-        Menampilkan <?php echo count($daftarBuku); ?>
-        dari <?php echo $totalBuku; ?> buku
-    </p>
 
     <div class="search-box">
 
@@ -104,6 +196,18 @@ if ($keyword !== '') {
 
     </div>
 
+    <p class="table-counter">
+        Menampilkan
+        <?php echo count($daftarBuku); ?>
+        dari
+        <?php echo $totalBuku; ?>
+        buku
+        <?php if ($keyword !== ''): ?>
+            untuk pencarian
+            "<?php echo htmlspecialchars($keyword); ?>"
+        <?php endif; ?>
+    </p>
+
     <div class="table-responsive">
 
         <table>
@@ -114,6 +218,7 @@ if ($keyword !== '') {
                     <th>Judul</th>
                     <th>Pengarang</th>
                     <th>Tahun</th>
+                    <th>ISBN</th>
                     <th>Stok</th>
                     <th>Kategori</th>
                     <th>Tanggal Ditambahkan</th>
@@ -127,25 +232,9 @@ if ($keyword !== '') {
                 <?php if (empty($daftarBuku)): ?>
 
                     <tr>
-
-                        <td colspan="7">
-
-                            <?php if ($keyword !== ''): ?>
-
-                                Buku dengan judul
-                                "<?php echo htmlspecialchars($keyword); ?>"
-                                tidak ditemukan.
-
-                            <?php else: ?>
-
-                                Belum ada data buku.
-                                Silakan tambah lewat menu
-                                "Tambah Buku".
-
-                            <?php endif; ?>
-
+                        <td colspan="8">
+                            Tidak ada data buku.
                         </td>
-
                     </tr>
 
                 <?php else: ?>
@@ -155,39 +244,39 @@ if ($keyword !== '') {
                         <tr>
 
                             <td>
-                                <?php echo htmlspecialchars(
-                                    $buku['judul'] ?? ''
-                                ); ?>
+                                <?php echo htmlspecialchars($buku['judul']); ?>
                             </td>
 
                             <td>
-                                <?php echo htmlspecialchars(
-                                    $buku['pengarang'] ?? ''
-                                ); ?>
+                                <?php echo htmlspecialchars($buku['pengarang']); ?>
                             </td>
 
                             <td>
-                                <?php echo htmlspecialchars(
-                                    $buku['tahun'] ?? ''
-                                ); ?>
+                                <?php echo htmlspecialchars($buku['tahun']); ?>
                             </td>
 
                             <td>
-                                <?php echo htmlspecialchars(
-                                    $buku['stok'] ?? ''
-                                ); ?>
+                                <?php
+                                echo htmlspecialchars(
+                                    $buku['isbn'] ?? '-'
+                                );
+                                ?>
                             </td>
 
                             <td>
-                                <?php echo htmlspecialchars(
-                                    $buku['kategori'] ?? ''
-                                ); ?>
+                                <?php echo htmlspecialchars($buku['stok']); ?>
                             </td>
 
                             <td>
-                                <?php echo htmlspecialchars(
-                                    $buku['tanggal_ditambahkan'] ?? ''
-                                ); ?>
+                                <?php echo htmlspecialchars($buku['kategori'] ?? '-'); ?>
+                            </td>
+
+                            <td>
+                                <?php
+                                echo htmlspecialchars(
+                                    $buku['tanggal_ditambahkan'] ?? '-'
+                                );
+                                ?>
                             </td>
 
                             <td>
@@ -235,6 +324,68 @@ if ($keyword !== '') {
         </table>
 
     </div>
+
+    <?php if ($totalPages > 1): ?>
+
+        <div class="pagination">
+
+            <?php if ($page > 1): ?>
+
+                <a
+                    href="?<?php
+                    echo http_build_query([
+                        'keyword' => $keyword,
+                        'page' => $page - 1
+                    ]);
+                    ?>">
+                    &laquo; Sebelumnya
+                </a>
+
+            <?php endif; ?>
+
+
+            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+
+                <?php if ($i === $page): ?>
+
+                    <span class="active">
+                        <?php echo $i; ?>
+                    </span>
+
+                <?php else: ?>
+
+                    <a
+                        href="?<?php
+                        echo http_build_query([
+                            'keyword' => $keyword,
+                            'page' => $i
+                        ]);
+                        ?>">
+                        <?php echo $i; ?>
+                    </a>
+
+                <?php endif; ?>
+
+            <?php endfor; ?>
+
+
+            <?php if ($page < $totalPages): ?>
+
+                <a
+                    href="?<?php
+                    echo http_build_query([
+                        'keyword' => $keyword,
+                        'page' => $page + 1
+                    ]);
+                    ?>">
+                    Berikutnya &raquo;
+                </a>
+
+            <?php endif; ?>
+
+        </div>
+
+    <?php endif; ?>
 
 </section>
 
