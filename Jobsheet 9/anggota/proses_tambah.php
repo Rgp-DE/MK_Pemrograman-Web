@@ -56,6 +56,7 @@ if (!empty($errors)) {
 }
 
 /* ===== Simpan data anggota ke PostgreSQL ===== */
+// Modifikasi No.1 - Menangani error UNIQUE pada No. Anggota
 try {
 
     $stmt = $pdo->prepare("
