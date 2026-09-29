@@ -8,7 +8,8 @@ $keyword = trim($_GET['keyword'] ?? '');
 
 /*
  * Modifikasi No.2
- * Mengubah jumlah data per halaman dari 5 menjadi 10.
+ * Menentukan jumlah data buku yang ditampilkan
+ * pada setiap halaman.
  */
 $perPage = 10;
 
@@ -24,15 +25,19 @@ if (!$page || $page < 1) {
 
 /*
  * Menghitung total data buku.
- * Jika ada keyword, jumlah total hanya berdasarkan
- * data yang sesuai dengan pencarian.
+ *
+ * Modifikasi No.3:
+ * Pencarian dilakukan pada kolom judul
+ * dan pengarang.
  */
 if ($keyword !== '') {
 
     $stmtCount = $pdo->prepare("
         SELECT COUNT(*)
         FROM buku
-        WHERE judul ILIKE :keyword
+        WHERE
+            judul ILIKE :keyword
+            OR pengarang ILIKE :keyword
     ");
 
     $stmtCount->execute([
@@ -57,8 +62,9 @@ $totalPages = max(
 );
 
 /*
- * Jika page melebihi jumlah halaman,
- * arahkan ke halaman terakhir.
+ * Jika halaman yang diminta melebihi
+ * jumlah halaman yang tersedia,
+ * gunakan halaman terakhir.
  */
 if ($page > $totalPages) {
     $page = $totalPages;
@@ -85,7 +91,9 @@ if ($keyword !== '') {
             kategori,
             tanggal_ditambahkan
         FROM buku
-        WHERE judul ILIKE :keyword
+        WHERE
+            judul ILIKE :keyword
+            OR pengarang ILIKE :keyword
         ORDER BY id DESC
         LIMIT :limit
         OFFSET :offset
@@ -164,12 +172,13 @@ include __DIR__ . '/../includes/header.php';
 
     <?php endif; ?>
 
+
     <div class="search-box">
 
         <form method="get" action="list.php">
 
             <label for="search-input">
-                Cari Judul Buku
+                Cari Judul atau Pengarang
             </label>
 
             <input
@@ -178,7 +187,7 @@ include __DIR__ . '/../includes/header.php';
                 name="keyword"
                 data-server-search="true"
                 value="<?php echo htmlspecialchars($keyword); ?>"
-                placeholder="Ketik judul buku...">
+                placeholder="Ketik judul atau pengarang...">
 
             <button type="submit">
                 Cari
@@ -196,17 +205,24 @@ include __DIR__ . '/../includes/header.php';
 
     </div>
 
+
     <p class="table-counter">
+
         Menampilkan
         <?php echo count($daftarBuku); ?>
         dari
         <?php echo $totalBuku; ?>
         buku
+
         <?php if ($keyword !== ''): ?>
+
             untuk pencarian
             "<?php echo htmlspecialchars($keyword); ?>"
+
         <?php endif; ?>
+
     </p>
+
 
     <div class="table-responsive">
 
@@ -227,14 +243,17 @@ include __DIR__ . '/../includes/header.php';
 
             </thead>
 
+
             <tbody>
 
                 <?php if (empty($daftarBuku)): ?>
 
                     <tr>
+
                         <td colspan="8">
                             Tidak ada data buku.
                         </td>
+
                     </tr>
 
                 <?php else: ?>
@@ -244,15 +263,27 @@ include __DIR__ . '/../includes/header.php';
                         <tr>
 
                             <td>
-                                <?php echo htmlspecialchars($buku['judul']); ?>
+                                <?php
+                                echo htmlspecialchars(
+                                    $buku['judul']
+                                );
+                                ?>
                             </td>
 
                             <td>
-                                <?php echo htmlspecialchars($buku['pengarang']); ?>
+                                <?php
+                                echo htmlspecialchars(
+                                    $buku['pengarang']
+                                );
+                                ?>
                             </td>
 
                             <td>
-                                <?php echo htmlspecialchars($buku['tahun']); ?>
+                                <?php
+                                echo htmlspecialchars(
+                                    $buku['tahun']
+                                );
+                                ?>
                             </td>
 
                             <td>
@@ -264,11 +295,19 @@ include __DIR__ . '/../includes/header.php';
                             </td>
 
                             <td>
-                                <?php echo htmlspecialchars($buku['stok']); ?>
+                                <?php
+                                echo htmlspecialchars(
+                                    $buku['stok']
+                                );
+                                ?>
                             </td>
 
                             <td>
-                                <?php echo htmlspecialchars($buku['kategori'] ?? '-'); ?>
+                                <?php
+                                echo htmlspecialchars(
+                                    $buku['kategori'] ?? '-'
+                                );
+                                ?>
                             </td>
 
                             <td>
@@ -287,11 +326,13 @@ include __DIR__ . '/../includes/header.php';
                                     Edit
                                 </a>
 
+
                                 <button
                                     type="button"
                                     class="btn-detail">
                                     Detail
                                 </button>
+
 
                                 <form
                                     class="form-hapus"
@@ -325,6 +366,7 @@ include __DIR__ . '/../includes/header.php';
 
     </div>
 
+
     <?php if ($totalPages > 1): ?>
 
         <div class="pagination">
@@ -344,7 +386,11 @@ include __DIR__ . '/../includes/header.php';
             <?php endif; ?>
 
 
-            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+            <?php for (
+                $i = 1;
+                $i <= $totalPages;
+                $i++
+            ): ?>
 
                 <?php if ($i === $page): ?>
 
