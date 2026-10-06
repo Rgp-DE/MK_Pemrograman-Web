@@ -127,6 +127,38 @@ die(
     $e->getMessage()
 );
 
+
+## 7. Audit Output yang Belum Diperiksa
+
+### Status
+
+[✓] Sudah diaudit
+
+### Pemeriksaan
+
+Menelusuri halaman dan file aplikasi di luar halaman yang telah
+diperiksa untuk menemukan output yang berasal dari database,
+`$_GET`, `$_POST`, atau session yang belum menggunakan helper `e()`.
+
+### Hasil Audit
+
+Hasil pemeriksaan menunjukkan bahwa output dinamis pada halaman
+yang menampilkan data database atau parameter pengguna telah
+menggunakan helper `e()`.
+
+Beberapa file lain seperti `migrasi_buku.php` hanya menampilkan
+nilai counter internal yang bukan berasal dari input pengguna
+atau database, sehingga tidak memerlukan escaping menggunakan
+`e()`.
+
+File `reset_session.php` juga hanya menampilkan pesan statis.
+
+### Kesimpulan
+
+Tidak ditemukan output baru yang berasal dari database,
+`$_GET`, `$_POST`, atau session yang perlu diperbaiki dengan
+helper `e()` pada audit tambahan ini.
+
 Penggunaan pesan error mentah seperti ini berpotensi memberikan
 informasi internal kepada pengguna. Informasi tersebut dapat
 membantu pihak yang tidak berwenang memahami konfigurasi atau
