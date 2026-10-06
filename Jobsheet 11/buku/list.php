@@ -21,12 +21,6 @@ if (!$page || $page < 1) {
     $page = 1;
 }
 
-/*
-|--------------------------------------------------------------------------
-| Cek role user
-|--------------------------------------------------------------------------
-*/
-
 $isAdmin =
     ($_SESSION['role'] ?? '') === 'admin';
 
@@ -190,6 +184,17 @@ include __DIR__ . '/../includes/header.php';
 
     <?php endif; ?>
 
+    <!--
+    ============================================================
+    FORM PENCARIAN
+    ============================================================
+
+    Form menggunakan GET karena hanya digunakan
+    untuk membaca/mencari data.
+
+    Tidak menggunakan CSRF token.
+    -->
+
     <div class="search-box">
 
         <form
@@ -211,13 +216,17 @@ include __DIR__ . '/../includes/header.php';
                 placeholder="Ketik judul atau pengarang...">
 
             <button type="submit">
+
                 Cari
+
             </button>
 
             <?php if ($keyword !== ''): ?>
 
                 <a href="list.php">
+
                     Reset
+
                 </a>
 
             <?php endif; ?>
@@ -225,6 +234,12 @@ include __DIR__ . '/../includes/header.php';
         </form>
 
     </div>
+
+    <!--
+    ============================================================
+    COUNTER
+    ============================================================
+    -->
 
     <p class="table-counter">
 
@@ -247,6 +262,12 @@ include __DIR__ . '/../includes/header.php';
         <?php endif; ?>
 
     </p>
+
+    <!--
+    ============================================================
+    TABEL BUKU
+    ============================================================
+    -->
 
     <div class="table-responsive">
 
@@ -314,51 +335,63 @@ include __DIR__ . '/../includes/header.php';
                         <tr>
 
                             <td>
+
                                 <?php
                                 echo e(
                                     $buku['judul']
                                 );
                                 ?>
+
                             </td>
 
                             <td>
+
                                 <?php
                                 echo e(
                                     $buku['pengarang']
                                 );
                                 ?>
+
                             </td>
 
                             <td>
+
                                 <?php
                                 echo e(
                                     $buku['tahun']
                                 );
                                 ?>
+
                             </td>
 
                             <td>
+
                                 <?php
                                 echo e(
                                     $buku['isbn'] ?? '-'
                                 );
                                 ?>
+
                             </td>
 
                             <td>
+
                                 <?php
                                 echo e(
                                     $buku['stok']
                                 );
                                 ?>
+
                             </td>
 
                             <td>
+
                                 <?php
                                 echo e(
                                     $buku['kategori'] ?? '-'
                                 );
                                 ?>
+
                             </td>
 
                             <td>
@@ -382,6 +415,13 @@ include __DIR__ . '/../includes/header.php';
 
                             <td>
 
+                                <!--
+                                ====================================================
+                                EDIT
+                                ====================================================
+                                Hanya admin yang dapat Edit.
+                                -->
+
                                 <?php if ($isAdmin): ?>
 
                                     <a
@@ -394,6 +434,12 @@ include __DIR__ . '/../includes/header.php';
 
                                 <?php endif; ?>
 
+                                <!--
+                                ====================================================
+                                DETAIL
+                                ====================================================
+                                -->
+
                                 <button
                                     type="button"
                                     class="btn-detail">
@@ -401,6 +447,14 @@ include __DIR__ . '/../includes/header.php';
                                     Detail
 
                                 </button>
+
+                                <!--
+                                ====================================================
+                                HAPUS
+                                ====================================================
+                                Hanya admin yang dapat Delete.
+                                ====================================================
+                                -->
 
                                 <?php if ($isAdmin): ?>
 
@@ -439,6 +493,12 @@ include __DIR__ . '/../includes/header.php';
         </table>
 
     </div>
+
+    <!--
+    ============================================================
+    PAGINATION
+    ============================================================
+    -->
 
     <?php if ($totalPages > 1): ?>
 
