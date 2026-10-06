@@ -335,6 +335,32 @@ textarea:focus {
 
 
 /* =========================
+   REMEMBER ME
+========================= */
+
+.remember-me {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.remember-me input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+    padding: 0;
+}
+
+.remember-me label {
+    display: inline;
+    margin: 0;
+    font-weight: normal;
+    cursor: pointer;
+}
+
+
+/* =========================
    BUTTON SUBMIT FORM
 ========================= */
 

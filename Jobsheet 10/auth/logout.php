@@ -2,24 +2,72 @@
 
 session_start();
 
+require_once __DIR__ . '/../includes/koneksi.php';
+
+
+$userId = $_SESSION['user_id'] ?? null;
+
+
 /*
 |--------------------------------------------------------------------------
-| Hapus Semua Data Session
+| Hapus token Remember Me dari database
+|--------------------------------------------------------------------------
+*/
+
+if ($userId) {
+
+    $stmt = $pdo->prepare("
+        UPDATE users
+        SET
+            remember_token_hash = NULL,
+            remember_token_expires = NULL
+        WHERE id = :id
+    ");
+
+
+    $stmt->execute([
+        'id' => $userId
+    ]);
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Hapus cookie Remember Me
+|--------------------------------------------------------------------------
+*/
+
+setcookie(
+    'remember_token',
+    '',
+    [
+        'expires' => time() - 3600,
+        'path' => '/',
+        'secure' =>
+            isset($_SERVER['HTTPS']) &&
+            $_SERVER['HTTPS'] !== 'off',
+        'httponly' => true,
+        'samesite' => 'Lax'
+    ]
+);
+
+
+/*
+|--------------------------------------------------------------------------
+| Hapus session
 |--------------------------------------------------------------------------
 */
 
 $_SESSION = [];
 
 
-/*
-|--------------------------------------------------------------------------
-| Hapus Session Cookie
-|--------------------------------------------------------------------------
-*/
+if (
+    ini_get("session.use_cookies")
+) {
 
-if (ini_get("session.use_cookies")) {
+    $params =
+        session_get_cookie_params();
 
-    $params = session_get_cookie_params();
 
     setcookie(
         session_name(),
@@ -33,34 +81,21 @@ if (ini_get("session.use_cookies")) {
 }
 
 
-/*
-|--------------------------------------------------------------------------
-| Hancurkan Session
-|--------------------------------------------------------------------------
-*/
-
 session_destroy();
 
 
-/*
-|--------------------------------------------------------------------------
-| Buat Session Baru Untuk Flash Message
-|--------------------------------------------------------------------------
-*/
-
 session_start();
+
 
 $_SESSION['flash'] = [
     'type' => 'success',
-    'pesan' => 'Anda berhasil logout.'
+    'pesan' =>
+        'Anda berhasil logout.'
 ];
 
 
-/*
-|--------------------------------------------------------------------------
-| Kembali ke Beranda
-|--------------------------------------------------------------------------
-*/
+header(
+    'Location: ../index.php'
+);
 
-header('Location: ../index.php');
 exit;

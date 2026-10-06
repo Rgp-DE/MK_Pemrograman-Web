@@ -6,7 +6,6 @@ $flash = $_SESSION['flash'] ?? null;
 unset($_SESSION['flash']);
 
 $page_title = "Login";
-$base = '../';
 
 include __DIR__ . '/../includes/header.php';
 
@@ -20,18 +19,28 @@ include __DIR__ . '/../includes/header.php';
         Silakan login untuk mengakses fitur pengelolaan data.
     </p>
 
+
     <?php if ($flash): ?>
 
-        <div class="alert <?php echo htmlspecialchars($flash['type']); ?>">
-            <?php echo htmlspecialchars($flash['pesan']); ?>
+        <div
+            class="alert <?php echo htmlspecialchars(
+                $flash['type']
+            ); ?>">
+
+            <?php echo htmlspecialchars(
+                $flash['pesan']
+            ); ?>
+
         </div>
 
     <?php endif; ?>
+
 
     <form
         action="proses_login.php"
         method="post"
         id="form-login">
+
 
         <div class="form-group">
 
@@ -48,6 +57,7 @@ include __DIR__ . '/../includes/header.php';
 
         </div>
 
+
         <div class="form-group">
 
             <label for="password">
@@ -63,24 +73,47 @@ include __DIR__ . '/../includes/header.php';
 
         </div>
 
+
+        <div class="remember-me">
+
+            <input
+                type="checkbox"
+                id="remember_me"
+                name="remember_me"
+                value="1">
+
+            <label for="remember_me">
+                Ingat Saya
+            </label>
+
+        </div>
+
+
         <div class="form-actions">
 
             <button
                 type="submit"
                 class="btn-edit">
+
                 Login
+
             </button>
+
 
             <a
                 href="register.php"
                 class="btn-detail">
+
                 Belum punya akun?
+
             </a>
 
         </div>
 
+
     </form>
 
 </section>
+
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>

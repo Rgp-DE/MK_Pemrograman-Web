@@ -22,7 +22,6 @@ function initNavToggle() {
     if (!toggleBtn || !nav) return;
 
     toggleBtn.addEventListener("click", function () {
-
         nav.classList.toggle("nav-open");
 
         const isOpen =
@@ -43,36 +42,28 @@ function initNavToggle() {
 ========================= */
 
 function initHapusConfirm() {
-
     document.addEventListener(
         "submit",
         function (e) {
-
             const form =
                 e.target.closest(".form-hapus");
 
             if (!form) return;
-
 
             const row =
                 form.closest("tr");
 
             let nama = "data ini";
 
-
             if (row) {
-
                 const firstCell =
                     row.querySelector("td");
 
                 if (firstCell) {
-
                     nama =
                         firstCell.textContent.trim();
-
                 }
             }
-
 
             const yakin = confirm(
                 'Yakin ingin menghapus "' +
@@ -80,16 +71,11 @@ function initHapusConfirm() {
                 '"?'
             );
 
-
             if (!yakin) {
-
                 e.preventDefault();
-
             }
-
         }
     );
-
 }
 
 
@@ -98,31 +84,23 @@ function initHapusConfirm() {
 ========================= */
 
 function initUpdateConfirm() {
-
     const formEdit =
         document.getElementById("form-edit");
 
     if (!formEdit) return;
 
-
     formEdit.addEventListener(
         "submit",
         function (e) {
-
             const yakin = confirm(
                 "Yakin ingin menyimpan perubahan data?"
             );
 
-
             if (!yakin) {
-
                 e.preventDefault();
-
             }
-
         }
     );
-
 }
 
 
@@ -131,7 +109,6 @@ function initUpdateConfirm() {
 ========================= */
 
 function initTableFilter() {
-
     const input =
         document.getElementById("search-input");
 
@@ -140,63 +117,48 @@ function initTableFilter() {
 
     if (!input || !table) return;
 
-
     /*
      * Jika pencarian menggunakan server,
      * jangan jalankan filter client-side.
      */
-
     if (
         input.dataset.serverSearch === "true"
     ) {
-
         return;
-
     }
-
 
     input.addEventListener(
         "input",
         function () {
-
             const keyword =
                 input.value
                     .trim()
                     .toLowerCase();
-
 
             const rows =
                 table.querySelectorAll(
                     "tbody tr"
                 );
 
-
             rows.forEach(function (row) {
-
                 const firstCell =
                     row.querySelector("td");
 
                 if (!firstCell) return;
 
-
                 const teks =
                     firstCell.textContent
                         .toLowerCase();
-
 
                 row.style.display =
                     teks.includes(keyword)
                         ? ""
                         : "none";
-
             });
 
-
             updateTableCounter(table);
-
         }
     );
-
 }
 
 
@@ -205,7 +167,6 @@ function initTableFilter() {
 ========================= */
 
 function updateTableCounter(table) {
-
     const counter =
         document.getElementById(
             "table-counter"
@@ -213,46 +174,36 @@ function updateTableCounter(table) {
 
     if (!counter || !table) return;
 
-
     const searchInput =
         document.getElementById(
             "search-input"
         );
 
-
     /*
      * Counter untuk server-side search
      * sudah dibuat oleh PHP.
      */
-
     if (
         searchInput &&
         searchInput.dataset.serverSearch === "true"
     ) {
-
         return;
-
     }
-
 
     const rows =
         table.querySelectorAll(
             "tbody tr"
         );
 
-
     const visibleRows =
         Array.from(rows).filter(
             function (row) {
-
                 return (
                     row.style.display !==
                     "none"
                 );
-
             }
         );
-
 
     counter.textContent =
         "Menampilkan " +
@@ -268,7 +219,6 @@ function updateTableCounter(table) {
 ========================= */
 
 function initValidasiForm() {
-
     const forms =
         document.querySelectorAll(
             "form"
@@ -276,30 +226,23 @@ function initValidasiForm() {
 
     if (!forms.length) return;
 
-
     forms.forEach(function (form) {
-
         /*
          * Form hapus tidak ikut
          * validasi field.
          */
-
         if (
             form.classList.contains(
                 "form-hapus"
             )
         ) {
-
             return;
-
         }
-
 
         /*
          * Jalankan validasi jika form
          * memiliki field Buku atau Anggota.
          */
-
         if (
             form.querySelector(
                 "[name='judul']"
@@ -311,28 +254,22 @@ function initValidasiForm() {
                 "[name='pengarang']"
             )
         ) {
-
             form.addEventListener(
                 "submit",
                 function (e) {
-
                     let valid = true;
-
 
                     /*
                      * Field wajib
                      */
-
                     const fieldWajib = [
                         "judul",
                         "nama",
                         "pengarang"
                     ];
 
-
                     fieldWajib.forEach(
                         function (namaField) {
-
                             const input =
                                 form.querySelector(
                                     "[name='" +
@@ -340,28 +277,21 @@ function initValidasiForm() {
                                     "']"
                                 );
 
-
                             if (!input) return;
-
 
                             if (
                                 input.value
                                     .trim() === ""
                             ) {
-
                                 tampilkanError(
                                     input,
                                     "Field ini wajib diisi."
                                 );
 
                                 valid = false;
-
                             } else {
-
                                 hapusError(input);
-
                             }
-
                         }
                     );
 
@@ -369,21 +299,17 @@ function initValidasiForm() {
                     /*
                      * Validasi Tahun
                      */
-
                     const tahun =
                         form.querySelector(
                             "[name='tahun']"
                         );
 
-
                     if (tahun) {
-
                         const nilaiTahun =
                             parseInt(
                                 tahun.value,
                                 10
                             );
-
 
                         if (
                             tahun.value.trim() !== "" &&
@@ -393,41 +319,32 @@ function initValidasiForm() {
                                 nilaiTahun > 2026
                             )
                         ) {
-
                             tampilkanError(
                                 tahun,
                                 "Tahun harus di antara 1900-2026."
                             );
 
                             valid = false;
-
                         } else {
-
                             hapusError(tahun);
-
                         }
-
                     }
 
 
                     /*
                      * Validasi Stok
                      */
-
                     const stok =
                         form.querySelector(
                             "[name='stok']"
                         );
 
-
                     if (stok) {
-
                         const nilaiStok =
                             parseInt(
                                 stok.value,
                                 10
                             );
-
 
                         if (
                             stok.value.trim() !== "" &&
@@ -436,38 +353,29 @@ function initValidasiForm() {
                                 nilaiStok < 0
                             )
                         ) {
-
                             tampilkanError(
                                 stok,
                                 "Stok tidak boleh negatif."
                             );
 
                             valid = false;
-
                         } else {
-
                             hapusError(stok);
-
                         }
-
                     }
 
 
                     /*
                      * Validasi ISBN
                      */
-
                     const isbn =
                         form.querySelector(
                             "[name='isbn']"
                         );
 
-
                     if (isbn) {
-
                         const nilai =
                             isbn.value.trim();
-
 
                         if (
                             nilai !== "" &&
@@ -475,38 +383,29 @@ function initValidasiForm() {
                                 nilai
                             )
                         ) {
-
                             tampilkanError(
                                 isbn,
                                 "ISBN hanya boleh berisi angka dan tanda hubung (-)."
                             );
 
                             valid = false;
-
                         } else {
-
                             hapusError(isbn);
-
                         }
-
                     }
 
 
                     /*
                      * Validasi No. Anggota
                      */
-
                     const noAnggota =
                         form.querySelector(
                             "[name='no_anggota']"
                         );
 
-
                     if (noAnggota) {
-
                         const nilai =
                             noAnggota.value.trim();
-
 
                         if (
                             nilai !== "" &&
@@ -514,38 +413,29 @@ function initValidasiForm() {
                                 nilai
                             )
                         ) {
-
                             tampilkanError(
                                 noAnggota,
                                 "No. Anggota hanya boleh berisi huruf, angka, dan tanda hubung (-)."
                             );
 
                             valid = false;
-
                         } else {
-
                             hapusError(noAnggota);
-
                         }
-
                     }
 
 
                     /*
                      * Validasi Email
                      */
-
                     const email =
                         form.querySelector(
                             "[name='email']"
                         );
 
-
                     if (email) {
-
                         const nilai =
                             email.value.trim();
-
 
                         if (
                             nilai !== "" &&
@@ -553,38 +443,29 @@ function initValidasiForm() {
                                 nilai
                             )
                         ) {
-
                             tampilkanError(
                                 email,
                                 "Format email tidak valid."
                             );
 
                             valid = false;
-
                         } else {
-
                             hapusError(email);
-
                         }
-
                     }
 
 
                     /*
                      * Validasi No. HP
                      */
-
                     const noHp =
                         form.querySelector(
                             "[name='no_hp']"
                         );
 
-
                     if (noHp) {
-
                         const nilai =
                             noHp.value.trim();
-
 
                         if (
                             nilai !== "" &&
@@ -592,20 +473,15 @@ function initValidasiForm() {
                                 nilai
                             )
                         ) {
-
                             tampilkanError(
                                 noHp,
                                 "No. HP hanya boleh berisi angka, spasi, tanda plus (+), dan tanda hubung (-)."
                             );
 
                             valid = false;
-
                         } else {
-
                             hapusError(noHp);
-
                         }
-
                     }
 
 
@@ -613,20 +489,13 @@ function initValidasiForm() {
                      * Batalkan submit jika
                      * validasi gagal.
                      */
-
                     if (!valid) {
-
                         e.preventDefault();
-
                     }
-
                 }
             );
-
         }
-
     });
-
 }
 
 
@@ -635,12 +504,10 @@ function initValidasiForm() {
 ========================= */
 
 function initAuthForm() {
-
     const formLogin =
         document.getElementById(
             "form-login"
         );
-
 
     const formRegister =
         document.getElementById(
@@ -651,21 +518,16 @@ function initAuthForm() {
     /*
      * Validasi Login
      */
-
     if (formLogin) {
-
         formLogin.addEventListener(
             "submit",
             function (e) {
-
                 let valid = true;
-
 
                 const username =
                     formLogin.querySelector(
                         "[name='username']"
                     );
-
 
                 const password =
                     formLogin.querySelector(
@@ -677,18 +539,14 @@ function initAuthForm() {
                     username &&
                     username.value.trim() === ""
                 ) {
-
                     tampilkanError(
                         username,
                         "Username wajib diisi."
                     );
 
                     valid = false;
-
                 } else if (username) {
-
                     hapusError(username);
-
                 }
 
 
@@ -696,57 +554,48 @@ function initAuthForm() {
                     password &&
                     password.value === ""
                 ) {
-
                     tampilkanError(
                         password,
                         "Password wajib diisi."
                     );
 
                     valid = false;
-
                 } else if (password) {
-
                     hapusError(password);
-
                 }
 
+
+                /*
+                 * Remember Me tidak perlu
+                 * divalidasi karena bersifat opsional.
+                 */
 
                 if (!valid) {
-
                     e.preventDefault();
-
                 }
-
             }
         );
-
     }
 
 
     /*
      * Validasi Register
      */
-
     if (formRegister) {
-
         formRegister.addEventListener(
             "submit",
             function (e) {
-
                 let valid = true;
-
 
                 const nama =
                     formRegister.querySelector(
                         "[name='nama']"
                     );
 
-
                 const username =
                     formRegister.querySelector(
                         "[name='username']"
                     );
-
 
                 const password =
                     formRegister.querySelector(
@@ -757,35 +606,28 @@ function initAuthForm() {
                 /*
                  * Nama
                  */
-
                 if (
                     nama &&
                     nama.value.trim() === ""
                 ) {
-
                     tampilkanError(
                         nama,
                         "Nama wajib diisi."
                     );
 
                     valid = false;
-
                 } else if (nama) {
-
                     hapusError(nama);
-
                 }
 
 
                 /*
                  * Username
                  */
-
                 if (
                     username &&
                     username.value.trim() === ""
                 ) {
-
                     tampilkanError(
                         username,
                         "Username wajib diisi."
@@ -799,30 +641,24 @@ function initAuthForm() {
                         username.value.trim()
                     )
                 ) {
-
                     tampilkanError(
                         username,
                         "Username hanya boleh berisi huruf, angka, underscore (_), dan tanda hubung (-)."
                     );
 
                     valid = false;
-
                 } else if (username) {
-
                     hapusError(username);
-
                 }
 
 
                 /*
                  * Password
                  */
-
                 if (
                     password &&
                     password.value === ""
                 ) {
-
                     tampilkanError(
                         password,
                         "Password wajib diisi."
@@ -834,32 +670,23 @@ function initAuthForm() {
                     password &&
                     password.value.length < 6
                 ) {
-
                     tampilkanError(
                         password,
                         "Password minimal harus 6 karakter."
                     );
 
                     valid = false;
-
                 } else if (password) {
-
                     hapusError(password);
-
                 }
 
 
                 if (!valid) {
-
                     e.preventDefault();
-
                 }
-
             }
         );
-
     }
-
 }
 
 
@@ -871,34 +698,27 @@ function tampilkanError(
     input,
     pesan
 ) {
-
     hapusError(input);
-
 
     input.classList.add(
         "input-error"
     );
-
 
     const error =
         document.createElement(
             "small"
         );
 
-
     error.className =
         "error-message";
 
-
     error.textContent =
         pesan;
-
 
     input.insertAdjacentElement(
         "afterend",
         error
     );
-
 }
 
 
@@ -907,15 +727,12 @@ function tampilkanError(
 ========================= */
 
 function hapusError(input) {
-
     input.classList.remove(
         "input-error"
     );
 
-
     const error =
         input.nextElementSibling;
-
 
     if (
         error &&
@@ -923,9 +740,6 @@ function hapusError(input) {
             "error-message"
         )
     ) {
-
         error.remove();
-
     }
-
 }

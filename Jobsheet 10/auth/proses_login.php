@@ -4,32 +4,34 @@ session_start();
 
 require_once __DIR__ . '/../includes/koneksi.php';
 
-$username = trim($_POST['username'] ?? '');
+
+$username = trim(
+    $_POST['username'] ?? ''
+);
+
 $password = $_POST['password'] ?? '';
 
-/*
-|--------------------------------------------------------------------------
-| Validasi Input
-|--------------------------------------------------------------------------
-*/
+$rememberMe = isset(
+    $_POST['remember_me']
+);
 
-if ($username === '' || $password === '') {
+
+if (
+    $username === '' ||
+    $password === ''
+) {
 
     $_SESSION['flash'] = [
         'type' => 'error',
-        'pesan' => 'Username dan password wajib diisi.'
+        'pesan' =>
+            'Username dan password wajib diisi.'
     ];
 
     header('Location: login.php');
+
     exit;
 }
 
-
-/*
-|--------------------------------------------------------------------------
-| Cari User Berdasarkan Username
-|--------------------------------------------------------------------------
-*/
 
 try {
 
@@ -44,55 +46,143 @@ try {
         WHERE username = :username
     ");
 
+
     $stmt->execute([
         'username' => $username
     ]);
 
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
+    $user = $stmt->fetch(
+        PDO::FETCH_ASSOC
+    );
 
-    /*
-    |--------------------------------------------------------------------------
-    | Cek User dan Password
-    |--------------------------------------------------------------------------
-    */
 
     if (
         !$user ||
-        !password_verify($password, $user['password'])
+        !password_verify(
+            $password,
+            $user['password']
+        )
     ) {
 
         $_SESSION['flash'] = [
             'type' => 'error',
-            'pesan' => 'Username atau password salah.'
+            'pesan' =>
+                'Username atau password salah.'
         ];
 
         header('Location: login.php');
+
         exit;
     }
 
 
     /*
     |--------------------------------------------------------------------------
-    | Login Berhasil
+    | Regenerasi session setelah login
     |--------------------------------------------------------------------------
     */
 
     session_regenerate_id(true);
 
-    $_SESSION['user_id'] = $user['id'];
-    $_SESSION['nama'] = $user['nama'];
-    $_SESSION['username'] = $user['username'];
-    $_SESSION['role'] = $user['role'];
+
+    $_SESSION['user_id'] =
+        $user['id'];
+
+    $_SESSION['nama'] =
+        $user['nama'];
+
+    $_SESSION['username'] =
+        $user['username'];
+
+    $_SESSION['role'] =
+        $user['role'];
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Remember Me
+    |--------------------------------------------------------------------------
+    */
+
+    if ($rememberMe) {
+
+        $token = bin2hex(
+            random_bytes(32)
+        );
+
+
+        $tokenHash = hash(
+            'sha256',
+            $token
+        );
+
+
+        $expires = time() + (
+            60 * 60 * 24 * 30
+        );
+
+
+        $stmtToken = $pdo->prepare("
+            UPDATE users
+            SET
+                remember_token_hash = :token_hash,
+                remember_token_expires =
+                    TO_TIMESTAMP(:expires)
+            WHERE id = :id
+        ");
+
+
+        $stmtToken->execute([
+            'token_hash' =>
+                $tokenHash,
+
+            'expires' =>
+                $expires,
+
+            'id' =>
+                $user['id']
+        ]);
+
+
+        setcookie(
+            'remember_token',
+            $token,
+            [
+                'expires' =>
+                    $expires,
+
+                'path' =>
+                    '/',
+
+                'secure' =>
+                    isset($_SERVER['HTTPS']) &&
+                    $_SERVER['HTTPS'] !== 'off',
+
+                'httponly' =>
+                    true,
+
+                'samesite' =>
+                    'Lax'
+            ]
+        );
+
+    }
 
 
     $_SESSION['flash'] = [
         'type' => 'success',
-        'pesan' => 'Login berhasil. Selamat datang, ' . $user['nama'] . '!'
+        'pesan' =>
+            'Login berhasil. Selamat datang, ' .
+            $user['nama'] .
+            '!'
     ];
 
 
-    header('Location: ../index.php');
+    header(
+        'Location: ../index.php'
+    );
+
     exit;
 
 
@@ -100,9 +190,11 @@ try {
 
     $_SESSION['flash'] = [
         'type' => 'error',
-        'pesan' => 'Terjadi kesalahan saat proses login.'
+        'pesan' =>
+            'Terjadi kesalahan saat proses login.'
     ];
 
     header('Location: login.php');
+
     exit;
 }
