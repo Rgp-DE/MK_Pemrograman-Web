@@ -2,21 +2,30 @@
 
 session_start();
 
+
 $flash = $_SESSION['flash'] ?? null;
-unset($_SESSION['flash']);
+
+unset(
+    $_SESSION['flash']
+);
+
 
 $page_title = "Login";
+
 
 include __DIR__ . '/../includes/header.php';
 
 ?>
 
+
 <section class="form-section">
 
     <h2>Login</h2>
 
+
     <p>
-        Silakan login untuk mengakses fitur pengelolaan data.
+        Silakan login untuk mengakses fitur
+        pengelolaan data.
     </p>
 
 
@@ -116,4 +125,8 @@ include __DIR__ . '/../includes/header.php';
 </section>
 
 
-<?php include __DIR__ . '/../includes/footer.php'; ?>
+<?php
+
+include __DIR__ . '/../includes/footer.php';
+
+?>

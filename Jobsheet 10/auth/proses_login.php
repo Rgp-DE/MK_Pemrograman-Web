@@ -16,6 +16,23 @@ $rememberMe = isset(
 );
 
 
+/*
+|--------------------------------------------------------------------------
+| Konfigurasi percobaan login
+|--------------------------------------------------------------------------
+*/
+
+$maxAttempts = 3;
+
+$lockDuration = 5 * 60;
+
+
+/*
+|--------------------------------------------------------------------------
+| Validasi input kosong
+|--------------------------------------------------------------------------
+*/
+
 if (
     $username === '' ||
     $password === ''
@@ -33,7 +50,100 @@ if (
 }
 
 
+/*
+|--------------------------------------------------------------------------
+| Siapkan data percobaan berdasarkan username
+|--------------------------------------------------------------------------
+*/
+
+if (
+    !isset(
+        $_SESSION['login_attempts']
+    )
+) {
+
+    $_SESSION['login_attempts'] = [];
+}
+
+
+if (
+    !isset(
+        $_SESSION['login_attempts'][$username]
+    )
+) {
+
+    $_SESSION['login_attempts'][$username] = [
+        'count' => 0,
+        'locked_until' => 0
+    ];
+}
+
+
+$attemptData =
+    &$_SESSION['login_attempts'][$username];
+
+
+/*
+|--------------------------------------------------------------------------
+| Cek apakah username sedang diblokir
+|--------------------------------------------------------------------------
+*/
+
+if (
+    $attemptData['locked_until'] > time()
+) {
+
+    $remaining =
+        $attemptData['locked_until'] - time();
+
+
+    $remainingMinutes =
+        ceil(
+            $remaining / 60
+        );
+
+
+    $_SESSION['flash'] = [
+        'type' => 'error',
+        'pesan' =>
+            'Terlalu banyak percobaan login gagal. ' .
+            'Silakan coba lagi dalam ' .
+            $remainingMinutes .
+            ' menit.'
+    ];
+
+
+    header('Location: login.php');
+
+    exit;
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Jika waktu blokir sudah selesai,
+| reset status blokir
+|--------------------------------------------------------------------------
+*/
+
+if (
+    $attemptData['locked_until'] <= time() &&
+    $attemptData['count'] >= $maxAttempts
+) {
+
+    $attemptData['count'] = 0;
+
+    $attemptData['locked_until'] = 0;
+}
+
+
 try {
+
+    /*
+    |--------------------------------------------------------------------------
+    | Ambil data user
+    |--------------------------------------------------------------------------
+    */
 
     $stmt = $pdo->prepare("
         SELECT
@@ -48,7 +158,8 @@ try {
 
 
     $stmt->execute([
-        'username' => $username
+        'username' =>
+            $username
     ]);
 
 
@@ -56,6 +167,12 @@ try {
         PDO::FETCH_ASSOC
     );
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | Verifikasi username dan password
+    |--------------------------------------------------------------------------
+    */
 
     if (
         !$user ||
@@ -65,13 +182,53 @@ try {
         )
     ) {
 
-        $_SESSION['flash'] = [
-            'type' => 'error',
-            'pesan' =>
-                'Username atau password salah.'
-        ];
+        $attemptData['count']++;
 
-        header('Location: login.php');
+
+        /*
+        |--------------------------------------------------------------------------
+        | Blokir setelah mencapai batas
+        |--------------------------------------------------------------------------
+        */
+
+        if (
+            $attemptData['count'] >=
+            $maxAttempts
+        ) {
+
+            $attemptData['locked_until'] =
+                time() +
+                $lockDuration;
+
+
+            $_SESSION['flash'] = [
+                'type' => 'error',
+                'pesan' =>
+                    'Terlalu banyak percobaan login gagal. ' .
+                    'Username diblokir sementara selama 5 menit.'
+            ];
+
+        } else {
+
+            $remainingAttempts =
+                $maxAttempts -
+                $attemptData['count'];
+
+
+            $_SESSION['flash'] = [
+                'type' => 'error',
+                'pesan' =>
+                    'Username atau password salah. ' .
+                    'Sisa percobaan: ' .
+                    $remainingAttempts .
+                    '.'
+            ];
+        }
+
+
+        header(
+            'Location: login.php'
+        );
 
         exit;
     }
@@ -79,7 +236,18 @@ try {
 
     /*
     |--------------------------------------------------------------------------
-    | Regenerasi session setelah login
+    | Login berhasil
+    |--------------------------------------------------------------------------
+    */
+
+    $attemptData['count'] = 0;
+
+    $attemptData['locked_until'] = 0;
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Regenerasi session
     |--------------------------------------------------------------------------
     */
 
@@ -118,15 +286,21 @@ try {
         );
 
 
-        $expires = time() + (
-            60 * 60 * 24 * 30
-        );
+        $expires =
+            time() +
+            (
+                60 *
+                60 *
+                24 *
+                30
+            );
 
 
         $stmtToken = $pdo->prepare("
             UPDATE users
             SET
-                remember_token_hash = :token_hash,
+                remember_token_hash =
+                    :token_hash,
                 remember_token_expires =
                     TO_TIMESTAMP(:expires)
             WHERE id = :id
@@ -166,9 +340,14 @@ try {
                     'Lax'
             ]
         );
-
     }
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | Pesan login berhasil
+    |--------------------------------------------------------------------------
+    */
 
     $_SESSION['flash'] = [
         'type' => 'success',
@@ -194,7 +373,9 @@ try {
             'Terjadi kesalahan saat proses login.'
     ];
 
-    header('Location: login.php');
+    header(
+        'Location: login.php'
+    );
 
     exit;
 }
