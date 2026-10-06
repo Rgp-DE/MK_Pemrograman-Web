@@ -1,37 +1,38 @@
 <?php
 
 require __DIR__ . '/../includes/auth.php';
-require __DIR__ . '/../includes/koneksi.php';
 
 
-/*
-|--------------------------------------------------------------------------
-| Delete harus menggunakan POST
-|--------------------------------------------------------------------------
-*/
-
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+if ($_SESSION['role'] !== 'admin') {
 
     $_SESSION['flash'] = [
-
-        'type' =>
-            'error',
-
+        'type' => 'error',
         'pesan' =>
-            'Metode request tidak valid.'
-
+            'Akses ditolak. Hanya admin yang dapat menghapus data anggota.'
     ];
 
     header('Location: list.php');
+
     exit;
 }
 
 
-/*
-|--------------------------------------------------------------------------
-| Ambil ID
-|--------------------------------------------------------------------------
-*/
+require __DIR__ . '/../includes/koneksi.php';
+
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+
+    $_SESSION['flash'] = [
+        'type' => 'error',
+        'pesan' =>
+            'Metode request tidak diperbolehkan.'
+    ];
+
+    header('Location: list.php');
+
+    exit;
+}
+
 
 $id = filter_input(
     INPUT_POST,
@@ -40,28 +41,19 @@ $id = filter_input(
 );
 
 
-if (!$id || $id < 1) {
+if (!$id) {
 
     $_SESSION['flash'] = [
-
-        'type' =>
-            'error',
-
+        'type' => 'error',
         'pesan' =>
             'ID anggota tidak valid.'
-
     ];
 
     header('Location: list.php');
+
     exit;
 }
 
-
-/*
-|--------------------------------------------------------------------------
-| Hapus Data
-|--------------------------------------------------------------------------
-*/
 
 try {
 
@@ -76,28 +68,20 @@ try {
     ]);
 
 
-    if ($stmt->rowCount() > 0) {
+    if ($stmt->rowCount() === 0) {
 
         $_SESSION['flash'] = [
-
-            'type' =>
-                'success',
-
+            'type' => 'error',
             'pesan' =>
-                'Data anggota berhasil dihapus.'
-
+                'Data anggota tidak ditemukan.'
         ];
 
     } else {
 
         $_SESSION['flash'] = [
-
-            'type' =>
-                'error',
-
+            'type' => 'success',
             'pesan' =>
-                'Data anggota tidak ditemukan.'
-
+                'Data anggota berhasil dihapus.'
         ];
 
     }
@@ -106,13 +90,9 @@ try {
 } catch (PDOException $e) {
 
     $_SESSION['flash'] = [
-
-        'type' =>
-            'error',
-
+        'type' => 'error',
         'pesan' =>
             'Terjadi kesalahan saat menghapus data anggota.'
-
     ];
 
 }

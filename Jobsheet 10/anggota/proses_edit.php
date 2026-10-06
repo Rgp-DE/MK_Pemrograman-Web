@@ -1,14 +1,24 @@
 <?php
 
 require __DIR__ . '/../includes/auth.php';
+
+
+if ($_SESSION['role'] !== 'admin') {
+
+    $_SESSION['flash'] = [
+        'type' => 'error',
+        'pesan' =>
+            'Akses ditolak. Hanya admin yang dapat mengubah data anggota.'
+    ];
+
+    header('Location: list.php');
+
+    exit;
+}
+
+
 require __DIR__ . '/../includes/koneksi.php';
 
-
-/*
-|--------------------------------------------------------------------------
-| Ambil Data dari Form
-|--------------------------------------------------------------------------
-*/
 
 $id = filter_input(
     INPUT_POST,
@@ -40,39 +50,19 @@ $email = trim(
 $errors = [];
 
 
-/*
-|--------------------------------------------------------------------------
-| Validasi ID
-|--------------------------------------------------------------------------
-*/
-
-if (!$id || $id < 1) {
+if (!$id) {
 
     $errors[] =
         'ID anggota tidak valid.';
-
 }
 
-
-/*
-|--------------------------------------------------------------------------
-| Validasi Nama
-|--------------------------------------------------------------------------
-*/
 
 if ($nama === '') {
 
     $errors[] =
         'Nama wajib diisi.';
-
 }
 
-
-/*
-|--------------------------------------------------------------------------
-| Validasi No. Anggota
-|--------------------------------------------------------------------------
-*/
 
 if ($noAnggota === '') {
 
@@ -88,15 +78,8 @@ if ($noAnggota === '') {
 
     $errors[] =
         'No. Anggota hanya boleh berisi huruf, angka, dan tanda hubung (-).';
-
 }
 
-
-/*
-|--------------------------------------------------------------------------
-| Validasi Email
-|--------------------------------------------------------------------------
-*/
 
 if ($email === '') {
 
@@ -112,15 +95,8 @@ if ($email === '') {
 
     $errors[] =
         'Format email tidak valid.';
-
 }
 
-
-/*
-|--------------------------------------------------------------------------
-| Validasi No. HP
-|--------------------------------------------------------------------------
-*/
 
 if (
     $noHp !== '' &&
@@ -132,36 +108,25 @@ if (
 
     $errors[] =
         'No. HP hanya boleh berisi angka, spasi, tanda plus (+), dan tanda hubung (-).';
-
 }
 
-
-/*
-|--------------------------------------------------------------------------
-| Jika Validasi Gagal
-|--------------------------------------------------------------------------
-*/
 
 if (!empty($errors)) {
 
     $_SESSION['flash'] = [
         'type' => 'error',
-        'pesan' => implode(' ', $errors)
+        'pesan' =>
+            implode(' ', $errors)
     ];
 
     header(
-        'Location: edit.php?id=' . $id
+        'Location: edit.php?id=' .
+        (int) $id
     );
 
     exit;
 }
 
-
-/*
-|--------------------------------------------------------------------------
-| Update Database
-|--------------------------------------------------------------------------
-*/
 
 try {
 
@@ -201,24 +166,14 @@ try {
 
 
     $_SESSION['flash'] = [
-
-        'type' =>
-            'success',
-
+        'type' => 'success',
         'pesan' =>
             'Data anggota berhasil diperbarui.'
-
     ];
 
 
 } catch (PDOException $e) {
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | UNIQUE violation
-    |--------------------------------------------------------------------------
-    */
 
     if (
         isset($e->errorInfo[0]) &&
@@ -226,18 +181,15 @@ try {
     ) {
 
         $_SESSION['flash'] = [
-
-            'type' =>
-                'error',
-
+            'type' => 'error',
             'pesan' =>
-                'No. Anggota sudah dipakai oleh anggota lain.'
-
+                'No. Anggota sudah dipakai, gunakan nomor lain.'
         ];
 
 
         header(
-            'Location: edit.php?id=' . $id
+            'Location: edit.php?id=' .
+            (int) $id
         );
 
         exit;
@@ -246,15 +198,18 @@ try {
 
 
     $_SESSION['flash'] = [
-
-        'type' =>
-            'error',
-
+        'type' => 'error',
         'pesan' =>
             'Terjadi kesalahan saat memperbarui data anggota.'
-
     ];
 
+
+    header(
+        'Location: edit.php?id=' .
+        (int) $id
+    );
+
+    exit;
 }
 
 

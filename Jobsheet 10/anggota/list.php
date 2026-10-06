@@ -1,22 +1,12 @@
 <?php
 
 require __DIR__ . '/../includes/auth.php';
+require __DIR__ . '/../includes/koneksi.php';
 
 $page_title = "Daftar Anggota";
 
-include __DIR__ . '/../includes/header.php';
-
-require __DIR__ . '/../includes/koneksi.php';
-
 $flash = $_SESSION['flash'] ?? null;
 unset($_SESSION['flash']);
-
-
-/*
-|--------------------------------------------------------------------------
-| Pagination
-|--------------------------------------------------------------------------
-*/
 
 $perPage = 5;
 
@@ -27,14 +17,9 @@ $page = max(
 
 $offset = ($page - 1) * $perPage;
 
-
-/*
-|--------------------------------------------------------------------------
-| Pencarian
-|--------------------------------------------------------------------------
-*/
-
-$keyword = trim($_GET['q'] ?? '');
+$keyword = trim(
+    $_GET['q'] ?? ''
+);
 
 
 if ($keyword !== '') {
@@ -113,7 +98,6 @@ $stmt->bindValue(
 
 $stmt->execute();
 
-
 $daftarAnggota = $stmt->fetchAll(
     PDO::FETCH_ASSOC
 );
@@ -121,19 +105,18 @@ $daftarAnggota = $stmt->fetchAll(
 
 $totalPages = max(
     1,
-    (int) ceil($totalRows / $perPage)
+    (int) ceil(
+        $totalRows / $perPage
+    )
 );
 
-
-/*
-|--------------------------------------------------------------------------
-| Jika page melebihi jumlah halaman
-|--------------------------------------------------------------------------
-*/
 
 if ($page > $totalPages) {
     $page = $totalPages;
 }
+
+
+include __DIR__ . '/../includes/header.php';
 
 ?>
 
@@ -144,11 +127,13 @@ if ($page > $totalPages) {
 
     <?php if ($flash): ?>
 
-        <p class="flash flash-<?php echo htmlspecialchars($flash['type']); ?>">
+        <p class="flash flash-<?php echo htmlspecialchars(
+            $flash['type']
+        ); ?>">
 
-            <?php
-            echo htmlspecialchars($flash['pesan']);
-            ?>
+            <?php echo htmlspecialchars(
+                $flash['pesan']
+            ); ?>
 
         </p>
 
@@ -161,25 +146,21 @@ if ($page > $totalPages) {
             method="get"
             action="list.php">
 
-            <span>
+            <label for="search-input">
+                Cari Nama Anggota
+            </label>
 
-                <label for="search-input">
-                    Cari Nama Anggota
-                </label>
+            <input
+                type="text"
+                id="search-input"
+                name="q"
+                value="<?php echo htmlspecialchars(
+                    $keyword
+                ); ?>"
+                placeholder="Ketik nama anggota...">
 
-                <br>
-
-                <input
-                    type="text"
-                    id="search-input"
-                    name="q"
-                    value="<?php echo htmlspecialchars($keyword); ?>"
-                    placeholder="Ketik nama anggota...">
-
-            </span>
-
-
-            <button type="submit">
+            <button
+                type="submit">
                 Cari
             </button>
 
@@ -195,6 +176,29 @@ if ($page > $totalPages) {
         </form>
 
     </div>
+
+
+    <p class="table-counter">
+
+        <?php if ($keyword !== ''): ?>
+
+            Menampilkan
+            <?php echo count($daftarAnggota); ?>
+            dari
+            <?php echo $totalRows; ?>
+            hasil pencarian
+
+        <?php else: ?>
+
+            Menampilkan
+            <?php echo count($daftarAnggota); ?>
+            dari
+            <?php echo $totalRows; ?>
+            anggota
+
+        <?php endif; ?>
+
+    </p>
 
 
     <div class="table-responsive">
@@ -213,6 +217,8 @@ if ($page > $totalPages) {
 
                     <th>No. HP</th>
 
+                    <th>Email</th>
+
                     <th>Aksi</th>
 
                 </tr>
@@ -226,9 +232,10 @@ if ($page > $totalPages) {
 
                     <tr>
 
-                        <td colspan="5">
+                        <td colspan="6">
 
-                            Tidak ada data anggota yang cocok.
+                            Tidak ada data anggota
+                            yang ditemukan.
 
                         </td>
 
@@ -236,73 +243,102 @@ if ($page > $totalPages) {
 
                 <?php else: ?>
 
-                    <?php foreach ($daftarAnggota as $anggota): ?>
+
+                    <?php foreach (
+                        $daftarAnggota as $anggota
+                    ): ?>
 
                         <tr>
 
                             <td>
-                                <?php
-                                echo htmlspecialchars(
+                                <?php echo htmlspecialchars(
                                     $anggota['no_anggota']
-                                );
-                                ?>
+                                ); ?>
                             </td>
 
 
                             <td>
-                                <?php
-                                echo htmlspecialchars(
+                                <?php echo htmlspecialchars(
                                     $anggota['nama']
-                                );
-                                ?>
+                                ); ?>
                             </td>
 
 
                             <td>
-                                <?php
-                                echo htmlspecialchars(
-                                    $anggota['alamat'] ?? ''
-                                );
-                                ?>
+                                <?php echo htmlspecialchars(
+                                    $anggota['alamat'] ?? '-'
+                                ); ?>
                             </td>
 
 
                             <td>
-                                <?php
-                                echo htmlspecialchars(
-                                    $anggota['no_hp'] ?? ''
-                                );
-                                ?>
+                                <?php echo htmlspecialchars(
+                                    $anggota['no_hp'] ?? '-'
+                                ); ?>
+                            </td>
+
+
+                            <td>
+                                <?php echo htmlspecialchars(
+                                    $anggota['email']
+                                ); ?>
                             </td>
 
 
                             <td>
 
-                                <a
-                                    href="edit.php?id=<?php echo (int) $anggota['id']; ?>"
-                                    class="btn-edit">
-                                    Edit
-                                </a>
+
+                                <?php if (
+                                    $_SESSION['role'] === 'admin'
+                                ): ?>
+
+                                    <a
+                                        href="edit.php?id=<?php echo (int) $anggota['id']; ?>"
+                                        class="btn-edit">
+
+                                        Edit
+
+                                    </a>
+
+                                <?php endif; ?>
 
 
-                                <form
-                                    class="form-hapus"
-                                    method="post"
-                                    action="hapus.php">
+                                <button
+                                    type="button"
+                                    class="btn-detail">
 
-                                    <input
-                                        type="hidden"
-                                        name="id"
-                                        value="<?php echo (int) $anggota['id']; ?>">
+                                    Detail
+
+                                </button>
 
 
-                                    <button
-                                        type="submit"
-                                        class="btn-hapus">
-                                        Hapus
-                                    </button>
+                                <?php if (
+                                    $_SESSION['role'] === 'admin'
+                                ): ?>
 
-                                </form>
+                                    <form
+                                        method="post"
+                                        action="hapus.php"
+                                        class="form-hapus">
+
+                                        <input
+                                            type="hidden"
+                                            name="id"
+                                            value="<?php echo (int) $anggota['id']; ?>">
+
+
+                                        <button
+                                            type="submit"
+                                            class="btn-hapus">
+
+                                            Hapus
+
+                                        </button>
+
+                                    </form>
+
+                                <?php endif; ?>
+
 
                             </td>
 
@@ -323,7 +359,24 @@ if ($page > $totalPages) {
 
         <nav class="pagination">
 
-            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+
+            <?php if ($page > 1): ?>
+
+                <a
+                    href="list.php?page=<?php echo $page - 1; ?><?php echo $keyword !== '' ? '&q=' . urlencode($keyword) : ''; ?>">
+
+                    &laquo; Sebelumnya
+
+                </a>
+
+            <?php endif; ?>
+
+
+            <?php for (
+                $i = 1;
+                $i <= $totalPages;
+                $i++
+            ): ?>
 
                 <a
                     href="list.php?page=<?php echo $i; ?><?php echo $keyword !== '' ? '&q=' . urlencode($keyword) : ''; ?>"
@@ -335,9 +388,23 @@ if ($page > $totalPages) {
 
             <?php endfor; ?>
 
+
+            <?php if ($page < $totalPages): ?>
+
+                <a
+                    href="list.php?page=<?php echo $page + 1; ?><?php echo $keyword !== '' ? '&q=' . urlencode($keyword) : ''; ?>">
+
+                    Berikutnya &raquo;
+
+                </a>
+
+            <?php endif; ?>
+
+
         </nav>
 
     <?php endif; ?>
+
 
 </section>
 

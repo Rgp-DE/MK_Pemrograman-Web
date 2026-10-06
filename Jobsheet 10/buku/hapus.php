@@ -1,30 +1,47 @@
 <?php
 
 require __DIR__ . '/../includes/auth.php';
+
+
+/*
+|--------------------------------------------------------------------------
+| Role Check
+|--------------------------------------------------------------------------
+*/
+
+if ($_SESSION['role'] !== 'admin') {
+
+    $_SESSION['flash'] = [
+        'type' => 'error',
+        'pesan' =>
+            'Akses ditolak. Hanya admin yang dapat menghapus data buku.'
+    ];
+
+    header('Location: list.php');
+
+    exit;
+}
+
+
 require __DIR__ . '/../includes/koneksi.php';
 
 
 /*
 |--------------------------------------------------------------------------
-| Delete Harus Menggunakan POST
+| Hanya izinkan POST
 |--------------------------------------------------------------------------
 */
 
-if (
-    $_SERVER['REQUEST_METHOD'] !== 'POST'
-) {
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
     $_SESSION['flash'] = [
-
-        'type' =>
-            'error',
-
+        'type' => 'error',
         'pesan' =>
-            'Metode request tidak valid.'
-
+            'Metode request tidak diperbolehkan.'
     ];
 
     header('Location: list.php');
+
     exit;
 }
 
@@ -42,26 +59,23 @@ $id = filter_input(
 );
 
 
-if (!$id || $id < 1) {
+if (!$id) {
 
     $_SESSION['flash'] = [
-
-        'type' =>
-            'error',
-
+        'type' => 'error',
         'pesan' =>
             'ID buku tidak valid.'
-
     ];
 
     header('Location: list.php');
+
     exit;
 }
 
 
 /*
 |--------------------------------------------------------------------------
-| Hapus Data
+| Hapus data
 |--------------------------------------------------------------------------
 */
 
@@ -78,28 +92,22 @@ try {
     ]);
 
 
-    if ($stmt->rowCount() > 0) {
+    if (
+        $stmt->rowCount() === 0
+    ) {
 
         $_SESSION['flash'] = [
-
-            'type' =>
-                'success',
-
+            'type' => 'error',
             'pesan' =>
-                'Data buku berhasil dihapus.'
-
+                'Data buku tidak ditemukan.'
         ];
 
     } else {
 
         $_SESSION['flash'] = [
-
-            'type' =>
-                'error',
-
+            'type' => 'success',
             'pesan' =>
-                'Data buku tidak ditemukan.'
-
+                'Data buku berhasil dihapus.'
         ];
 
     }
@@ -108,13 +116,9 @@ try {
 } catch (PDOException $e) {
 
     $_SESSION['flash'] = [
-
-        'type' =>
-            'error',
-
+        'type' => 'error',
         'pesan' =>
             'Terjadi kesalahan saat menghapus data buku.'
-
     ];
 
 }

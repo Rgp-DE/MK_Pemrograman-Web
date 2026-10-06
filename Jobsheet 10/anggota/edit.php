@@ -1,14 +1,27 @@
 <?php
 
 require __DIR__ . '/../includes/auth.php';
+
+
+if ($_SESSION['role'] !== 'admin') {
+
+    $_SESSION['flash'] = [
+        'type' => 'error',
+        'pesan' =>
+            'Akses ditolak. Hanya admin yang dapat mengedit data anggota.'
+    ];
+
+    header('Location: list.php');
+
+    exit;
+}
+
+
 require __DIR__ . '/../includes/koneksi.php';
 
 
-/*
-|--------------------------------------------------------------------------
-| Ambil ID
-|--------------------------------------------------------------------------
-*/
+$page_title = "Edit Anggota";
+
 
 $id = filter_input(
     INPUT_GET,
@@ -16,7 +29,8 @@ $id = filter_input(
     FILTER_VALIDATE_INT
 );
 
-if (!$id || $id < 1) {
+
+if (!$id) {
 
     $_SESSION['flash'] = [
         'type' => 'error',
@@ -24,15 +38,10 @@ if (!$id || $id < 1) {
     ];
 
     header('Location: list.php');
+
     exit;
 }
 
-
-/*
-|--------------------------------------------------------------------------
-| Ambil Data Anggota
-|--------------------------------------------------------------------------
-*/
 
 $stmt = $pdo->prepare("
     SELECT
@@ -46,18 +55,16 @@ $stmt = $pdo->prepare("
     WHERE id = :id
 ");
 
+
 $stmt->execute([
     'id' => $id
 ]);
 
-$anggota = $stmt->fetch(PDO::FETCH_ASSOC);
 
+$anggota = $stmt->fetch(
+    PDO::FETCH_ASSOC
+);
 
-/*
-|--------------------------------------------------------------------------
-| Jika Data Tidak Ditemukan
-|--------------------------------------------------------------------------
-*/
 
 if (!$anggota) {
 
@@ -67,24 +74,48 @@ if (!$anggota) {
     ];
 
     header('Location: list.php');
+
     exit;
 }
 
 
-$page_title = "Edit Anggota";
+$flash = $_SESSION['flash'] ?? null;
+
+unset(
+    $_SESSION['flash']
+);
+
 
 include __DIR__ . '/../includes/header.php';
 
 ?>
 
-<section>
+
+<section class="form-section">
 
     <h2>Edit Anggota</h2>
 
+
+    <?php if ($flash): ?>
+
+        <div
+            class="alert <?php echo htmlspecialchars(
+                $flash['type']
+            ); ?>">
+
+            <?php echo htmlspecialchars(
+                $flash['pesan']
+            ); ?>
+
+        </div>
+
+    <?php endif; ?>
+
+
     <form
-        id="form-edit"
+        action="proses_edit.php"
         method="post"
-        action="proses_edit.php">
+        id="form-edit">
 
 
         <input
@@ -93,95 +124,94 @@ include __DIR__ . '/../includes/header.php';
             value="<?php echo (int) $anggota['id']; ?>">
 
 
-        <p>
+        <div class="form-group">
 
             <label for="nama">
                 Nama
             </label>
 
-            <br>
-
             <input
                 type="text"
                 id="nama"
                 name="nama"
-                value="<?php echo htmlspecialchars($anggota['nama']); ?>"
+                value="<?php echo htmlspecialchars(
+                    $anggota['nama']
+                ); ?>"
                 required>
 
-        </p>
+        </div>
 
 
-        <p>
+        <div class="form-group">
 
             <label for="no_anggota">
                 No. Anggota
             </label>
 
-            <br>
-
             <input
                 type="text"
                 id="no_anggota"
                 name="no_anggota"
-                value="<?php echo htmlspecialchars($anggota['no_anggota']); ?>"
+                value="<?php echo htmlspecialchars(
+                    $anggota['no_anggota']
+                ); ?>"
                 required>
 
-        </p>
+        </div>
 
 
-        <p>
+        <div class="form-group">
 
             <label for="alamat">
                 Alamat
             </label>
 
-            <br>
-
-            <input
-                type="text"
+            <textarea
                 id="alamat"
                 name="alamat"
-                value="<?php echo htmlspecialchars($anggota['alamat'] ?? ''); ?>">
+                rows="4"><?php echo htmlspecialchars(
+                    $anggota['alamat'] ?? ''
+                ); ?></textarea>
 
-        </p>
+        </div>
 
 
-        <p>
+        <div class="form-group">
 
             <label for="no_hp">
                 No. HP
             </label>
 
-            <br>
-
             <input
                 type="text"
                 id="no_hp"
                 name="no_hp"
-                value="<?php echo htmlspecialchars($anggota['no_hp'] ?? ''); ?>">
+                value="<?php echo htmlspecialchars(
+                    $anggota['no_hp'] ?? ''
+                ); ?>">
 
-        </p>
+        </div>
 
 
-        <p>
+        <div class="form-group">
 
             <label for="email">
                 Email
             </label>
 
-            <br>
-
             <input
                 type="email"
                 id="email"
                 name="email"
-                value="<?php echo htmlspecialchars($anggota['email']); ?>"
+                value="<?php echo htmlspecialchars(
+                    $anggota['email']
+                ); ?>"
                 required>
 
-        </p>
+        </div>
 
 
-        <p>
+        <div class="form-actions">
 
             <button
                 type="submit"
@@ -200,7 +230,7 @@ include __DIR__ . '/../includes/header.php';
 
             </a>
 
-        </p>
+        </div>
 
 
     </form>

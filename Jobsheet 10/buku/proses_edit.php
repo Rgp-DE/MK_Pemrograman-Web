@@ -1,14 +1,30 @@
 <?php
 
 require __DIR__ . '/../includes/auth.php';
-require __DIR__ . '/../includes/koneksi.php';
 
 
 /*
 |--------------------------------------------------------------------------
-| Ambil Data Form
+| Role Check
 |--------------------------------------------------------------------------
 */
+
+if ($_SESSION['role'] !== 'admin') {
+
+    $_SESSION['flash'] = [
+        'type' => 'error',
+        'pesan' =>
+            'Akses ditolak. Hanya admin yang dapat mengubah data buku.'
+    ];
+
+    header('Location: list.php');
+
+    exit;
+}
+
+
+require __DIR__ . '/../includes/koneksi.php';
+
 
 $id = filter_input(
     INPUT_POST,
@@ -50,11 +66,10 @@ $errors = [];
 |--------------------------------------------------------------------------
 */
 
-if (!$id || $id < 1) {
+if (!$id) {
 
     $errors[] =
         'ID buku tidak valid.';
-
 }
 
 
@@ -68,7 +83,6 @@ if ($judul === '') {
 
     $errors[] =
         'Judul wajib diisi.';
-
 }
 
 
@@ -82,7 +96,6 @@ if ($pengarang === '') {
 
     $errors[] =
         'Pengarang wajib diisi.';
-
 }
 
 
@@ -97,7 +110,9 @@ if ($tahun === '') {
     $errors[] =
         'Tahun wajib diisi.';
 
-} elseif (!is_numeric($tahun)) {
+} elseif (
+    !is_numeric($tahun)
+) {
 
     $errors[] =
         'Tahun harus berupa angka.';
@@ -109,7 +124,6 @@ if ($tahun === '') {
 
     $errors[] =
         'Tahun harus berada antara 1900 dan 2026.';
-
 }
 
 
@@ -124,16 +138,19 @@ if ($stok === '') {
     $errors[] =
         'Stok wajib diisi.';
 
-} elseif (!is_numeric($stok)) {
+} elseif (
+    !is_numeric($stok)
+) {
 
     $errors[] =
         'Stok harus berupa angka.';
 
-} elseif ((int) $stok < 0) {
+} elseif (
+    (int) $stok < 0
+) {
 
     $errors[] =
         'Stok tidak boleh kurang dari 0.';
-
 }
 
 
@@ -153,7 +170,6 @@ if (
 
     $errors[] =
         'ISBN hanya boleh berisi angka dan tanda hubung (-).';
-
 }
 
 
@@ -182,14 +198,13 @@ if (
 ) {
 
     $errors[] =
-        'Kategori tidak valid.';
-
+        'Kategori buku tidak valid.';
 }
 
 
 /*
 |--------------------------------------------------------------------------
-| Jika Validasi Gagal
+| Jika validasi gagal
 |--------------------------------------------------------------------------
 */
 
@@ -197,11 +212,13 @@ if (!empty($errors)) {
 
     $_SESSION['flash'] = [
         'type' => 'error',
-        'pesan' => implode(' ', $errors)
+        'pesan' =>
+            implode(' ', $errors)
     ];
 
     header(
-        'Location: edit.php?id=' . $id
+        'Location: edit.php?id=' .
+        (int) $id
     );
 
     exit;
@@ -210,7 +227,7 @@ if (!empty($errors)) {
 
 /*
 |--------------------------------------------------------------------------
-| Update Database
+| Update database
 |--------------------------------------------------------------------------
 */
 
@@ -258,28 +275,27 @@ try {
 
 
     $_SESSION['flash'] = [
-
-        'type' =>
-            'success',
-
+        'type' => 'success',
         'pesan' =>
             'Data buku berhasil diperbarui.'
-
     ];
 
 
 } catch (PDOException $e) {
 
     $_SESSION['flash'] = [
-
-        'type' =>
-            'error',
-
+        'type' => 'error',
         'pesan' =>
             'Terjadi kesalahan saat memperbarui data buku.'
-
     ];
 
+
+    header(
+        'Location: edit.php?id=' .
+        (int) $id
+    );
+
+    exit;
 }
 
 

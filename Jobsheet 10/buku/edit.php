@@ -1,14 +1,33 @@
 <?php
 
 require __DIR__ . '/../includes/auth.php';
-require __DIR__ . '/../includes/koneksi.php';
 
 
 /*
 |--------------------------------------------------------------------------
-| Ambil ID Buku
+| Role Check
 |--------------------------------------------------------------------------
 */
+
+if ($_SESSION['role'] !== 'admin') {
+
+    $_SESSION['flash'] = [
+        'type' => 'error',
+        'pesan' =>
+            'Akses ditolak. Hanya admin yang dapat mengedit data buku.'
+    ];
+
+    header('Location: list.php');
+
+    exit;
+}
+
+
+require __DIR__ . '/../includes/koneksi.php';
+
+
+$page_title = "Edit Buku";
+
 
 $id = filter_input(
     INPUT_GET,
@@ -16,21 +35,24 @@ $id = filter_input(
     FILTER_VALIDATE_INT
 );
 
-if (!$id || $id < 1) {
+
+if (!$id) {
 
     $_SESSION['flash'] = [
         'type' => 'error',
-        'pesan' => 'ID buku tidak valid.'
+        'pesan' =>
+            'ID buku tidak valid.'
     ];
 
     header('Location: list.php');
+
     exit;
 }
 
 
 /*
 |--------------------------------------------------------------------------
-| Ambil Data Buku
+| Ambil data buku
 |--------------------------------------------------------------------------
 */
 
@@ -42,52 +64,73 @@ $stmt = $pdo->prepare("
         tahun,
         isbn,
         stok,
-        kategori,
-        tanggal_ditambahkan
+        kategori
     FROM buku
     WHERE id = :id
 ");
+
 
 $stmt->execute([
     'id' => $id
 ]);
 
-$buku = $stmt->fetch(PDO::FETCH_ASSOC);
 
+$buku = $stmt->fetch(
+    PDO::FETCH_ASSOC
+);
 
-/*
-|--------------------------------------------------------------------------
-| Jika Buku Tidak Ditemukan
-|--------------------------------------------------------------------------
-*/
 
 if (!$buku) {
 
     $_SESSION['flash'] = [
         'type' => 'error',
-        'pesan' => 'Data buku tidak ditemukan.'
+        'pesan' =>
+            'Data buku tidak ditemukan.'
     ];
 
     header('Location: list.php');
+
     exit;
 }
 
 
-$page_title = "Edit Buku";
+$flash = $_SESSION['flash'] ?? null;
+
+unset(
+    $_SESSION['flash']
+);
+
 
 include __DIR__ . '/../includes/header.php';
 
 ?>
 
-<section>
+
+<section class="form-section">
 
     <h2>Edit Buku</h2>
 
 
+    <?php if ($flash): ?>
+
+        <div
+            class="alert <?php echo htmlspecialchars(
+                $flash['type']
+            ); ?>">
+
+            <?php echo htmlspecialchars(
+                $flash['pesan']
+            ); ?>
+
+        </div>
+
+    <?php endif; ?>
+
+
     <form
-        id="form-edit"
+        action="proses_edit.php"
         method="post"
-        action="proses_edit.php">
+        id="form-edit">
 
 
         <input
@@ -96,106 +139,102 @@ include __DIR__ . '/../includes/header.php';
             value="<?php echo (int) $buku['id']; ?>">
 
 
-        <p>
+        <div class="form-group">
 
             <label for="judul">
                 Judul
             </label>
 
-            <br>
-
             <input
                 type="text"
                 id="judul"
                 name="judul"
-                value="<?php echo htmlspecialchars($buku['judul']); ?>"
+                value="<?php echo htmlspecialchars(
+                    $buku['judul']
+                ); ?>"
                 required>
 
-        </p>
+        </div>
 
 
-        <p>
+        <div class="form-group">
 
             <label for="pengarang">
                 Pengarang
             </label>
 
-            <br>
-
             <input
                 type="text"
                 id="pengarang"
                 name="pengarang"
-                value="<?php echo htmlspecialchars($buku['pengarang']); ?>"
+                value="<?php echo htmlspecialchars(
+                    $buku['pengarang']
+                ); ?>"
                 required>
 
-        </p>
+        </div>
 
 
-        <p>
+        <div class="form-group">
 
             <label for="tahun">
                 Tahun
             </label>
 
-            <br>
-
             <input
                 type="number"
                 id="tahun"
                 name="tahun"
-                min="1900"
-                max="2026"
-                value="<?php echo (int) $buku['tahun']; ?>"
+                value="<?php echo htmlspecialchars(
+                    $buku['tahun']
+                ); ?>"
                 required>
 
-        </p>
+        </div>
 
 
-        <p>
+        <div class="form-group">
 
             <label for="isbn">
                 ISBN
             </label>
 
-            <br>
-
             <input
                 type="text"
                 id="isbn"
                 name="isbn"
-                value="<?php echo htmlspecialchars($buku['isbn'] ?? ''); ?>"
+                value="<?php echo htmlspecialchars(
+                    $buku['isbn'] ?? ''
+                ); ?>"
                 placeholder="Contoh: 978-602-1234">
 
-        </p>
+        </div>
 
 
-        <p>
+        <div class="form-group">
 
             <label for="stok">
                 Stok
             </label>
-
-            <br>
 
             <input
                 type="number"
                 id="stok"
                 name="stok"
                 min="0"
-                value="<?php echo (int) $buku['stok']; ?>"
+                value="<?php echo htmlspecialchars(
+                    $buku['stok']
+                ); ?>"
                 required>
 
-        </p>
+        </div>
 
 
-        <p>
+        <div class="form-group">
 
             <label for="kategori">
                 Kategori
             </label>
-
-            <br>
 
             <select
                 id="kategori"
@@ -206,40 +245,43 @@ include __DIR__ . '/../includes/header.php';
                     -- Pilih Kategori --
                 </option>
 
+
                 <option
                     value="fiksi"
-                    <?php echo $buku['kategori'] === 'fiksi' ? 'selected' : ''; ?>>
+                    <?php echo $buku['kategori'] === 'fiksi'
+                        ? 'selected'
+                        : ''; ?>>
 
                     Fiksi
 
                 </option>
 
+
                 <option
                     value="non-fiksi"
-                    <?php echo $buku['kategori'] === 'non-fiksi' ? 'selected' : ''; ?>>
+                    <?php echo $buku['kategori'] === 'non-fiksi'
+                        ? 'selected'
+                        : ''; ?>>
 
                     Non-Fiksi
 
                 </option>
 
+
                 <option
                     value="referensi"
-                    <?php echo $buku['kategori'] === 'referensi' ? 'selected' : ''; ?>>
+                    <?php echo $buku['kategori'] === 'referensi'
+                        ? 'selected'
+                        : ''; ?>>
 
                     Referensi
 
                 </option>
 
-                <?php
-                /*
-                 * Data lama hasil migrasi JS8 menggunakan
-                 * kategori seperti Novel, Sejarah, dan
-                 * Pengembangan Diri.
-                 *
-                 * Opsi ini dibuat agar data lama tetap
-                 * bisa ditampilkan saat diedit.
-                 */
-                ?>
+
+                <!--
+                Kategori lama dari data migrasi JS6
+                -->
 
                 <?php
                 $kategoriLama = [
@@ -247,45 +289,36 @@ include __DIR__ . '/../includes/header.php';
                     'Sejarah',
                     'Pengembangan Diri'
                 ];
-
-                if (
-                    !in_array(
-                        $buku['kategori'],
-                        [
-                            'fiksi',
-                            'non-fiksi',
-                            'referensi'
-                        ],
-                        true
-                    ) &&
-                    in_array(
-                        $buku['kategori'],
-                        $kategoriLama,
-                        true
-                    )
-                ):
                 ?>
 
-                    <option
-                        value="<?php echo htmlspecialchars($buku['kategori']); ?>"
-                        selected>
 
-                        <?php
-                        echo htmlspecialchars(
-                            $buku['kategori']
-                        );
-                        ?>
+                <?php foreach (
+                    $kategoriLama as $kategori
+                ): ?>
+
+                    <option
+                        value="<?php echo htmlspecialchars(
+                            $kategori
+                        ); ?>"
+                        <?php echo $buku['kategori'] === $kategori
+                            ? 'selected'
+                            : ''; ?>>
+
+                        <?php echo htmlspecialchars(
+                            $kategori
+                        ); ?>
 
                     </option>
 
-                <?php endif; ?>
+                <?php endforeach; ?>
+
 
             </select>
 
-        </p>
+        </div>
 
 
-        <p>
+        <div class="form-actions">
 
             <button
                 type="submit"
@@ -304,7 +337,7 @@ include __DIR__ . '/../includes/header.php';
 
             </a>
 
-        </p>
+        </div>
 
 
     </form>
@@ -312,8 +345,4 @@ include __DIR__ . '/../includes/header.php';
 </section>
 
 
-<?php
-
-include __DIR__ . '/../includes/footer.php';
-
-?>
+<?php include __DIR__ . '/../includes/footer.php'; ?>

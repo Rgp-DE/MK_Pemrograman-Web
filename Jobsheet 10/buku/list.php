@@ -5,23 +5,9 @@ require __DIR__ . '/../includes/koneksi.php';
 
 $page_title = "Daftar Buku";
 
-
-/*
-|--------------------------------------------------------------------------
-| Ambil Keyword Pencarian
-|--------------------------------------------------------------------------
-*/
-
 $keyword = trim(
     $_GET['keyword'] ?? ''
 );
-
-
-/*
-|--------------------------------------------------------------------------
-| Pagination
-|--------------------------------------------------------------------------
-*/
 
 $perPage = 10;
 
@@ -38,7 +24,7 @@ if (!$page || $page < 1) {
 
 /*
 |--------------------------------------------------------------------------
-| Hitung Total Data
+| Hitung total data
 |--------------------------------------------------------------------------
 */
 
@@ -69,12 +55,6 @@ if ($keyword !== '') {
 }
 
 
-/*
-|--------------------------------------------------------------------------
-| Hitung Jumlah Halaman
-|--------------------------------------------------------------------------
-*/
-
 $totalPages = max(
     1,
     (int) ceil(
@@ -88,14 +68,12 @@ if ($page > $totalPages) {
 }
 
 
-$offset = (
-    $page - 1
-) * $perPage;
+$offset = ($page - 1) * $perPage;
 
 
 /*
 |--------------------------------------------------------------------------
-| Ambil Data Buku
+| Ambil data buku
 |--------------------------------------------------------------------------
 */
 
@@ -160,7 +138,6 @@ $stmt->bindValue(
 
 $stmt->execute();
 
-
 $daftarBuku = $stmt->fetchAll(
     PDO::FETCH_ASSOC
 );
@@ -168,7 +145,7 @@ $daftarBuku = $stmt->fetchAll(
 
 /*
 |--------------------------------------------------------------------------
-| Flash Message
+| Flash message
 |--------------------------------------------------------------------------
 */
 
@@ -179,9 +156,16 @@ unset(
 );
 
 
+/*
+|--------------------------------------------------------------------------
+| Header
+|--------------------------------------------------------------------------
+*/
+
 include __DIR__ . '/../includes/header.php';
 
 ?>
+
 
 <section>
 
@@ -190,13 +174,14 @@ include __DIR__ . '/../includes/header.php';
 
     <?php if ($flash): ?>
 
-        <p class="flash flash-<?php echo htmlspecialchars($flash['type']); ?>">
+        <p
+            class="flash flash-<?php echo htmlspecialchars(
+                $flash['type']
+            ); ?>">
 
-            <?php
-            echo htmlspecialchars(
+            <?php echo htmlspecialchars(
                 $flash['pesan']
-            );
-            ?>
+            ); ?>
 
         </p>
 
@@ -210,7 +195,9 @@ include __DIR__ . '/../includes/header.php';
             action="list.php">
 
             <label for="search-input">
+
                 Cari Judul atau Pengarang
+
             </label>
 
 
@@ -219,19 +206,26 @@ include __DIR__ . '/../includes/header.php';
                 id="search-input"
                 name="keyword"
                 data-server-search="true"
-                value="<?php echo htmlspecialchars($keyword); ?>"
+                value="<?php echo htmlspecialchars(
+                    $keyword
+                ); ?>"
                 placeholder="Ketik judul atau pengarang...">
 
 
-            <button type="submit">
+            <button
+                type="submit">
+
                 Cari
+
             </button>
 
 
             <?php if ($keyword !== ''): ?>
 
                 <a href="list.php">
+
                     Reset
+
                 </a>
 
             <?php endif; ?>
@@ -301,7 +295,8 @@ include __DIR__ . '/../includes/header.php';
 
                         <td colspan="8">
 
-                            Tidak ada data buku yang ditemukan.
+                            Tidak ada data buku
+                            yang ditemukan.
 
                         </td>
 
@@ -310,73 +305,62 @@ include __DIR__ . '/../includes/header.php';
                 <?php else: ?>
 
 
-                    <?php foreach ($daftarBuku as $buku): ?>
+                    <?php foreach (
+                        $daftarBuku as $buku
+                    ): ?>
 
                         <tr>
 
-
                             <td>
 
-                                <?php
-                                echo htmlspecialchars(
+                                <?php echo htmlspecialchars(
                                     $buku['judul']
-                                );
-                                ?>
+                                ); ?>
 
                             </td>
 
 
                             <td>
 
-                                <?php
-                                echo htmlspecialchars(
+                                <?php echo htmlspecialchars(
                                     $buku['pengarang']
-                                );
-                                ?>
+                                ); ?>
 
                             </td>
 
 
                             <td>
 
-                                <?php
-                                echo htmlspecialchars(
+                                <?php echo htmlspecialchars(
                                     $buku['tahun']
-                                );
-                                ?>
+                                ); ?>
 
                             </td>
 
 
                             <td>
 
-                                <?php
-                                echo htmlspecialchars(
+                                <?php echo htmlspecialchars(
                                     $buku['isbn'] ?? '-'
-                                );
-                                ?>
+                                ); ?>
 
                             </td>
 
 
                             <td>
 
-                                <?php
-                                echo htmlspecialchars(
+                                <?php echo htmlspecialchars(
                                     $buku['stok']
-                                );
-                                ?>
+                                ); ?>
 
                             </td>
 
 
                             <td>
 
-                                <?php
-                                echo htmlspecialchars(
+                                <?php echo htmlspecialchars(
                                     $buku['kategori'] ?? '-'
-                                );
-                                ?>
+                                ); ?>
 
                             </td>
 
@@ -389,7 +373,9 @@ include __DIR__ . '/../includes/header.php';
                                     date(
                                         'd-m-Y H:i',
                                         strtotime(
-                                            $buku['tanggal_ditambahkan']
+                                            $buku[
+                                                'tanggal_ditambahkan'
+                                            ]
                                         )
                                     )
                                 );
@@ -401,13 +387,20 @@ include __DIR__ . '/../includes/header.php';
 
                             <td>
 
-                                <a
-                                    href="edit.php?id=<?php echo (int) $buku['id']; ?>"
-                                    class="btn-edit">
 
-                                    Edit
+                                <?php if (
+                                    $_SESSION['role'] === 'admin'
+                                ): ?>
 
-                                </a>
+                                    <a
+                                        href="edit.php?id=<?php echo (int) $buku['id']; ?>"
+                                        class="btn-edit">
+
+                                        Edit
+
+                                    </a>
+
+                                <?php endif; ?>
 
 
                                 <button
@@ -419,34 +412,39 @@ include __DIR__ . '/../includes/header.php';
                                 </button>
 
 
-                                <form
-                                    method="post"
-                                    action="hapus.php"
-                                    class="form-hapus">
+                                <?php if (
+                                    $_SESSION['role'] === 'admin'
+                                ): ?>
 
-                                    <input
-                                        type="hidden"
-                                        name="id"
-                                        value="<?php echo (int) $buku['id']; ?>">
+                                    <form
+                                        method="post"
+                                        action="hapus.php"
+                                        class="form-hapus">
+
+                                        <input
+                                            type="hidden"
+                                            name="id"
+                                            value="<?php echo (int) $buku['id']; ?>">
 
 
-                                    <button
-                                        type="submit"
-                                        class="btn-hapus">
+                                        <button
+                                            type="submit"
+                                            class="btn-hapus">
 
-                                        Hapus
+                                            Hapus
 
-                                    </button>
+                                        </button>
 
-                                </form>
+                                    </form>
+
+                                <?php endif; ?>
+
 
                             </td>
-
 
                         </tr>
 
                     <?php endforeach; ?>
-
 
                 <?php endif; ?>
 
@@ -460,6 +458,7 @@ include __DIR__ . '/../includes/header.php';
     <?php if ($totalPages > 1): ?>
 
         <nav class="pagination">
+
 
             <?php if ($page > 1): ?>
 
@@ -501,15 +500,13 @@ include __DIR__ . '/../includes/header.php';
 
             <?php endif; ?>
 
+
         </nav>
 
     <?php endif; ?>
 
+
 </section>
 
 
-<?php
-
-include __DIR__ . '/../includes/footer.php';
-
-?>
+<?php include __DIR__ . '/../includes/footer.php'; ?>
