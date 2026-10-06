@@ -1,0 +1,786 @@
+/* =========================
+   RESET DASAR
+========================= */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+    background-color: #f5f7f5;
+    color: #333;
+    line-height: 1.6;
+}
+
+a {
+    color: inherit;
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+header {
+    background-color: #2d6a4f;
+    color: white;
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+
+/* =========================
+   NAVIGASI
+========================= */
+
+header nav {
+    margin-left: auto;
+}
+
+header nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+header nav a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+header nav a:hover {
+    text-decoration: underline;
+}
+
+
+/* =========================
+   AUTH STATUS
+========================= */
+
+.auth-status {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    white-space: nowrap;
+}
+
+.auth-status span {
+    color: white;
+    font-weight: bold;
+}
+
+.auth-status a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.auth-status a:hover {
+    text-decoration: underline;
+}
+
+
+/* =========================
+   HAMBURGER
+========================= */
+
+.nav-toggle-label {
+    display: none;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+}
+
+
+/* =========================
+   MAIN
+========================= */
+
+main {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+section {
+    width: 100%;
+}
+
+h2 {
+    margin-top: 0;
+    color: #2d6a4f;
+}
+
+
+/* =========================
+   STATISTIK
+========================= */
+
+.statistik {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.statistik .card {
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow:
+        0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.statistik .card h3 {
+    margin-top: 0;
+    color: #2d6a4f;
+}
+
+.statistik .card p {
+    margin-bottom: 0;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+
+/* =========================
+   TABLE
+========================= */
+
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    background-color: white;
+    border-radius: 8px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 700px;
+}
+
+table th,
+table td {
+    border: 1px solid #ddd;
+    padding: 0.75rem;
+    text-align: left;
+    vertical-align: middle;
+}
+
+table th {
+    background-color: #2d6a4f;
+    color: white;
+}
+
+table tbody tr:nth-child(even) {
+    background-color: #f8f8f8;
+}
+
+table tbody tr:hover {
+    background-color: #eef5f0;
+}
+
+
+/* =========================
+   KOLOM AKSI TABEL
+========================= */
+
+table td:last-child {
+    white-space: nowrap;
+}
+
+table td:last-child > .btn-edit,
+table td:last-child > .btn-detail,
+table td:last-child > .form-hapus {
+    display: inline-block;
+    vertical-align: middle;
+    margin: 0 0.15rem;
+}
+
+
+/* =========================
+   TOMBOL UMUM
+========================= */
+
+button,
+.btn-edit,
+.btn-detail,
+.btn-hapus {
+    border: none;
+    border-radius: 5px;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+    font-family: inherit;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+
+/* =========================
+   TOMBOL EDIT
+========================= */
+
+.btn-edit {
+    display: inline-block;
+    background-color: #2d6a4f;
+    color: white;
+}
+
+.btn-edit:hover {
+    background-color: #24553f;
+    text-decoration: none;
+}
+
+
+/* =========================
+   TOMBOL DETAIL
+========================= */
+
+.btn-detail {
+    display: inline-block;
+    background-color: #00b4d8;
+    color: white;
+}
+
+.btn-detail:hover {
+    background-color: #0096b2;
+}
+
+
+/* =========================
+   TOMBOL HAPUS
+========================= */
+
+.form-hapus {
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+    vertical-align: middle;
+}
+
+.form-hapus .btn-hapus {
+    display: inline-block;
+    background-color: #c0392b;
+    color: white;
+}
+
+.form-hapus .btn-hapus:hover {
+    background-color: #a93226;
+}
+
+
+/* =========================
+   FORM
+========================= */
+
+form {
+    width: 100%;
+}
+
+form p {
+    margin-bottom: 1rem;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.35rem;
+    font-weight: bold;
+}
+
+input,
+select,
+textarea {
+    width: 100%;
+    padding: 0.65rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-family: inherit;
+    font-size: 1rem;
+    background-color: white;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: #2d6a4f;
+    box-shadow:
+        0 0 0 2px
+        rgba(45, 106, 79, 0.15);
+}
+
+
+/* =========================
+   BUTTON SUBMIT FORM
+========================= */
+
+form button[type="submit"] {
+    background-color: #2d6a4f;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 0.65rem 1rem;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 1rem;
+}
+
+form button[type="submit"]:hover {
+    background-color: #24553f;
+}
+
+
+/* =========================
+   OVERRIDE TOMBOL HAPUS
+========================= */
+
+form.form-hapus button[type="submit"] {
+    background-color: #c0392b;
+    color: white;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+}
+
+form.form-hapus button[type="submit"]:hover {
+    background-color: #a93226;
+}
+
+
+/* =========================
+   FORM EDIT
+========================= */
+
+#form-edit {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow:
+        0 2px 5px
+        rgba(0, 0, 0, 0.05);
+}
+
+#form-edit p:last-child {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+#form-edit p:last-child a {
+    display: inline-block;
+    padding: 0.65rem 1rem;
+    border-radius: 5px;
+    background-color: #777;
+    color: white;
+    text-decoration: none;
+}
+
+#form-edit p:last-child a:hover {
+    background-color: #555;
+}
+
+
+/* =========================
+   FORM SECTION
+========================= */
+
+.form-section {
+    max-width: 600px;
+    margin: 0 auto;
+    background-color: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow:
+        0 2px 5px
+        rgba(0, 0, 0, 0.05);
+}
+
+.form-section h2 {
+    margin-bottom: 0.5rem;
+}
+
+.form-section > p {
+    color: #555;
+}
+
+
+/* =========================
+   FORM ACTIONS
+========================= */
+
+.form-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+.form-actions .btn-detail {
+    background-color: #777;
+}
+
+.form-actions .btn-detail:hover {
+    background-color: #555;
+}
+
+
+/* =========================
+   SEARCH BOX
+========================= */
+
+.search-box {
+    margin-bottom: 1rem;
+}
+
+.search-box form {
+    display: flex;
+    align-items: end;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.search-box label {
+    width: 100%;
+}
+
+.search-box input {
+    flex: 1;
+    min-width: 200px;
+}
+
+.search-box button {
+    background-color: #2d6a4f;
+    color: white;
+}
+
+.search-box button:hover {
+    background-color: #24553f;
+}
+
+.search-box a {
+    display: inline-block;
+    padding: 0.5rem 0.75rem;
+    background-color: #777;
+    color: white;
+    border-radius: 5px;
+    text-decoration: none;
+}
+
+.search-box a:hover {
+    background-color: #555;
+}
+
+
+/* =========================
+   TABLE COUNTER
+========================= */
+
+.table-counter {
+    margin: 0.5rem 0 1rem;
+    color: #555;
+    font-size: 0.95rem;
+}
+
+
+/* =========================
+   PAGINATION
+========================= */
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 1.5rem;
+}
+
+.pagination a {
+    display: inline-block;
+    padding: 0.5rem 0.75rem;
+    border-radius: 5px;
+    background-color: white;
+    border: 1px solid #ccc;
+    color: #2d6a4f;
+    text-decoration: none;
+}
+
+.pagination a:hover {
+    background-color: #eef5f0;
+}
+
+.pagination a.active {
+    background-color: #2d6a4f;
+    color: white;
+    border-color: #2d6a4f;
+}
+
+
+/* =========================
+   FLASH MESSAGE
+========================= */
+
+.flash {
+    padding: 0.75rem 1rem;
+    border-radius: 5px;
+    margin-bottom: 1rem;
+}
+
+.flash-success {
+    background-color: #d8f3dc;
+    color: #1b4332;
+    border: 1px solid #95d5b2;
+}
+
+.flash-error {
+    background-color: #f8d7da;
+    color: #842029;
+    border: 1px solid #f1aeb5;
+}
+
+
+/* =========================
+   AUTH ALERT
+========================= */
+
+.alert {
+    padding: 0.75rem 1rem;
+    border-radius: 5px;
+    margin-bottom: 1rem;
+}
+
+.alert.success {
+    background-color: #d8f3dc;
+    color: #1b4332;
+    border: 1px solid #95d5b2;
+}
+
+.alert.error {
+    background-color: #f8d7da;
+    color: #842029;
+    border: 1px solid #f1aeb5;
+}
+
+
+/* =========================
+   VALIDASI ERROR
+========================= */
+
+.input-error {
+    border-color: #c0392b !important;
+}
+
+.error-message {
+    display: block;
+    margin-top: 0.25rem;
+    color: #c0392b;
+    font-size: 0.85rem;
+}
+
+
+/* =========================
+   CODE RESPONSIVE
+========================= */
+
+.code-responsive {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.code-responsive pre {
+    min-width: max-content;
+}
+
+
+/* =========================
+   FOOTER
+========================= */
+
+footer {
+    margin-top: 2rem;
+    padding: 1.5rem 2rem;
+    background-color: #2d6a4f;
+    color: white;
+    text-align: center;
+}
+
+footer p {
+    margin: 0;
+}
+
+
+/* =========================
+   RESPONSIVE BESAR
+========================= */
+
+@media (min-width: 1400px) {
+
+    main {
+        max-width: 1200px;
+    }
+
+}
+
+
+/* =========================
+   TABLET
+========================= */
+
+@media (max-width: 900px) {
+
+    .statistik {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+    header {
+        flex-wrap: wrap;
+    }
+
+    header nav {
+        width: 100%;
+    }
+
+    header nav ul {
+        flex-wrap: wrap;
+    }
+
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 600px) {
+
+    header {
+        display: block;
+        padding: 1rem;
+    }
+
+    header h1 {
+        display: inline-block;
+    }
+
+    .nav-toggle-label {
+        display: block;
+        float: right;
+    }
+
+    header nav {
+        width: 100%;
+        clear: both;
+        padding-top: 1rem;
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        transition:
+            max-height 0.4s ease,
+            opacity 0.3s ease;
+    }
+
+    header nav ul {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    header nav.nav-open {
+        max-height: 300px;
+        opacity: 1;
+    }
+
+    .auth-status {
+        margin-top: 1rem;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+
+    main {
+        padding: 1rem;
+    }
+
+    .statistik {
+        grid-template-columns: 1fr;
+    }
+
+    .search-box form {
+        display: block;
+    }
+
+    .search-box input {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+
+    .search-box button,
+    .search-box a {
+        margin-right: 0.25rem;
+    }
+
+    .form-section {
+        padding: 1.25rem;
+    }
+
+    .form-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .form-actions button,
+    .form-actions a {
+        text-align: center;
+    }
+
+    #form-edit p:last-child {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    #form-edit p:last-child button,
+    #form-edit p:last-child a {
+        text-align: center;
+    }
+
+    table {
+        min-width: 700px;
+    }
+
+    table td:last-child {
+        white-space: nowrap;
+    }
+
+    table td:last-child > .btn-edit,
+    table td:last-child > .btn-detail,
+    table td:last-child > .form-hapus {
+        display: inline-block;
+        vertical-align: middle;
+        margin: 0 0.1rem;
+    }
+
+}
