@@ -68,8 +68,46 @@ try {
     $pdo->beginTransaction();
 
     /*
-    | Kunci baris anggota agar proses peminjaman
-    | untuk anggota yang sama tidak berjalan bersamaan.
+    |--------------------------------------------------------------------------
+    | 1. Kunci dan periksa stok buku
+    |--------------------------------------------------------------------------
+    |
+    | Jika request lain sedang memproses buku yang sama,
+    | PostgreSQL akan membuat request ini menunggu.
+    |
+    */
+
+    $stmtBuku = $pdo->prepare("
+        SELECT id, stok
+        FROM buku
+        WHERE id = :id
+        FOR UPDATE
+    ");
+
+    $stmtBuku->execute([
+        'id' => $bukuId
+    ]);
+
+    $buku = $stmtBuku->fetch(
+        PDO::FETCH_ASSOC
+    );
+
+    if (!$buku) {
+        throw new RuntimeException(
+            'Data buku tidak ditemukan.'
+        );
+    }
+
+    if ((int) $buku['stok'] < 1) {
+        throw new RuntimeException(
+            'Stok buku tidak tersedia.'
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | 2. Kunci dan periksa anggota
+    |--------------------------------------------------------------------------
     */
 
     $stmtAnggota = $pdo->prepare("
@@ -95,7 +133,7 @@ try {
 
     /*
     |--------------------------------------------------------------------------
-    | Validasi bisnis keterlambatan lebih dari 14 hari
+    | 3. Validasi bisnis keterlambatan
     |--------------------------------------------------------------------------
     */
 
@@ -122,34 +160,7 @@ try {
 
     /*
     |--------------------------------------------------------------------------
-    | Kunci dan periksa stok buku
-    |--------------------------------------------------------------------------
-    */
-
-    $stmtBuku = $pdo->prepare("
-        SELECT id, stok
-        FROM buku
-        WHERE id = :id
-        FOR UPDATE
-    ");
-
-    $stmtBuku->execute([
-        'id' => $bukuId
-    ]);
-
-    $buku = $stmtBuku->fetch(
-        PDO::FETCH_ASSOC
-    );
-
-    if (!$buku || (int) $buku['stok'] < 1) {
-        throw new RuntimeException(
-            'Stok buku tidak tersedia.'
-        );
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Simpan peminjaman dan tanggal jatuh tempo
+    | 4. Catat peminjaman dan tanggal jatuh tempo
     |--------------------------------------------------------------------------
     */
 
@@ -177,7 +188,7 @@ try {
 
     /*
     |--------------------------------------------------------------------------
-    | Kurangi stok buku satu
+    | 5. Kurangi stok buku
     |--------------------------------------------------------------------------
     */
 
@@ -193,7 +204,7 @@ try {
 
     /*
     |--------------------------------------------------------------------------
-    | Simpan transaksi
+    | 6. Commit transaksi
     |--------------------------------------------------------------------------
     */
 
@@ -201,10 +212,15 @@ try {
 
     $_SESSION['flash'] = [
         'type' => 'success',
-        'pesan' => 'Peminjaman berhasil disimpan. Tanggal jatuh tempo ditetapkan 14 hari setelah tanggal pinjam.'
+        'pesan' => 'Peminjaman berhasil disimpan. Stok buku telah dikurangi.'
     ];
 
 } catch (Throwable $e) {
+
+    /*
+    | Jika ada kegagalan, batalkan semua perubahan
+    | agar transaksi dan stok tetap konsisten.
+    */
 
     if ($pdo->inTransaction()) {
         $pdo->rollBack();
