@@ -808,3 +808,31 @@ footer p {
         margin: 0 0.1rem;
     }
 }
+
+
+/* =========================
+   STATUS JATUH TEMPO
+   JOBSHEET 12
+========================= */
+
+.status-terlambat {
+    display: inline-block;
+    padding: 0.3rem 0.6rem;
+    border-radius: 5px;
+    background-color: #f8d7da;
+    color: #842029;
+    font-size: 0.85rem;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.status-aman {
+    display: inline-block;
+    padding: 0.3rem 0.6rem;
+    border-radius: 5px;
+    background-color: #d8f3dc;
+    color: #1b4332;
+    font-size: 0.85rem;
+    font-weight: bold;
+    white-space: nowrap;
+}

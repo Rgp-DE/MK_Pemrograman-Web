@@ -27,7 +27,7 @@ csrf_verify();
 
 /*
 |--------------------------------------------------------------------------
-| Ambil dan validasi input
+| Validasi input
 |--------------------------------------------------------------------------
 */
 
@@ -68,13 +68,8 @@ try {
     $pdo->beginTransaction();
 
     /*
-    |--------------------------------------------------------------------------
-    | Pastikan anggota tersedia dan kunci baris anggota
-    |--------------------------------------------------------------------------
-    |
-    | Penguncian baris anggota membantu menserialisasi proses
-    | peminjaman baru untuk anggota yang sama.
-    |
+    | Kunci baris anggota agar proses peminjaman
+    | untuk anggota yang sama tidak berjalan bersamaan.
     */
 
     $stmtAnggota = $pdo->prepare("
@@ -100,8 +95,7 @@ try {
 
     /*
     |--------------------------------------------------------------------------
-    | Validasi bisnis:
-    | Tolak anggota dengan peminjaman aktif lebih dari 14 hari
+    | Validasi bisnis keterlambatan lebih dari 14 hari
     |--------------------------------------------------------------------------
     */
 
@@ -128,7 +122,7 @@ try {
 
     /*
     |--------------------------------------------------------------------------
-    | Kunci baris buku dan periksa ketersediaan stok
+    | Kunci dan periksa stok buku
     |--------------------------------------------------------------------------
     */
 
@@ -155,7 +149,7 @@ try {
 
     /*
     |--------------------------------------------------------------------------
-    | Catat transaksi peminjaman
+    | Simpan peminjaman dan tanggal jatuh tempo
     |--------------------------------------------------------------------------
     */
 
@@ -164,12 +158,14 @@ try {
             buku_id,
             anggota_id,
             tanggal_pinjam,
+            tanggal_jatuh_tempo,
             status
         )
         VALUES (
             :buku_id,
             :anggota_id,
             CURRENT_DATE,
+            (CURRENT_DATE + INTERVAL '14 days')::DATE,
             'dipinjam'
         )
     ");
@@ -181,7 +177,7 @@ try {
 
     /*
     |--------------------------------------------------------------------------
-    | Kurangi stok buku sebanyak satu
+    | Kurangi stok buku satu
     |--------------------------------------------------------------------------
     */
 
@@ -205,7 +201,7 @@ try {
 
     $_SESSION['flash'] = [
         'type' => 'success',
-        'pesan' => 'Peminjaman berhasil disimpan. Stok buku telah dikurangi.'
+        'pesan' => 'Peminjaman berhasil disimpan. Tanggal jatuh tempo ditetapkan 14 hari setelah tanggal pinjam.'
     ];
 
 } catch (Throwable $e) {
