@@ -68,8 +68,68 @@ try {
     $pdo->beginTransaction();
 
     /*
-    | Kunci baris buku agar stok tidak digunakan
-    | oleh transaksi lain secara bersamaan.
+    |--------------------------------------------------------------------------
+    | Pastikan anggota tersedia dan kunci baris anggota
+    |--------------------------------------------------------------------------
+    |
+    | Penguncian baris anggota membantu menserialisasi proses
+    | peminjaman baru untuk anggota yang sama.
+    |
+    */
+
+    $stmtAnggota = $pdo->prepare("
+        SELECT id
+        FROM anggota
+        WHERE id = :id
+        FOR UPDATE
+    ");
+
+    $stmtAnggota->execute([
+        'id' => $anggotaId
+    ]);
+
+    $anggota = $stmtAnggota->fetch(
+        PDO::FETCH_ASSOC
+    );
+
+    if (!$anggota) {
+        throw new RuntimeException(
+            'Data anggota tidak ditemukan.'
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Validasi bisnis:
+    | Tolak anggota dengan peminjaman aktif lebih dari 14 hari
+    |--------------------------------------------------------------------------
+    */
+
+    $stmtTerlambat = $pdo->prepare("
+        SELECT COUNT(*)
+        FROM peminjaman
+        WHERE
+            anggota_id = :anggota_id
+            AND status = 'dipinjam'
+            AND CURRENT_DATE - tanggal_pinjam > 14
+    ");
+
+    $stmtTerlambat->execute([
+        'anggota_id' => $anggotaId
+    ]);
+
+    $jumlahTerlambat = (int) $stmtTerlambat->fetchColumn();
+
+    if ($jumlahTerlambat > 0) {
+        throw new RuntimeException(
+            'Peminjaman baru ditolak. Anggota memiliki buku yang terlambat dikembalikan lebih dari 14 hari. Silakan kembalikan buku tersebut terlebih dahulu.'
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Kunci baris buku dan periksa ketersediaan stok
+    |--------------------------------------------------------------------------
     */
 
     $stmtBuku = $pdo->prepare("
@@ -83,7 +143,9 @@ try {
         'id' => $bukuId
     ]);
 
-    $buku = $stmtBuku->fetch(PDO::FETCH_ASSOC);
+    $buku = $stmtBuku->fetch(
+        PDO::FETCH_ASSOC
+    );
 
     if (!$buku || (int) $buku['stok'] < 1) {
         throw new RuntimeException(
@@ -92,29 +154,9 @@ try {
     }
 
     /*
-    | Pastikan anggota benar-benar tersedia.
-    */
-
-    $stmtAnggota = $pdo->prepare("
-        SELECT id
-        FROM anggota
-        WHERE id = :id
-    ");
-
-    $stmtAnggota->execute([
-        'id' => $anggotaId
-    ]);
-
-    $anggota = $stmtAnggota->fetch(PDO::FETCH_ASSOC);
-
-    if (!$anggota) {
-        throw new RuntimeException(
-            'Data anggota tidak ditemukan.'
-        );
-    }
-
-    /*
-    | Catat transaksi peminjaman.
+    |--------------------------------------------------------------------------
+    | Catat transaksi peminjaman
+    |--------------------------------------------------------------------------
     */
 
     $stmtInsert = $pdo->prepare("
@@ -138,7 +180,9 @@ try {
     ]);
 
     /*
-    | Kurangi stok buku sebanyak satu.
+    |--------------------------------------------------------------------------
+    | Kurangi stok buku sebanyak satu
+    |--------------------------------------------------------------------------
     */
 
     $stmtUpdate = $pdo->prepare("
@@ -152,7 +196,9 @@ try {
     ]);
 
     /*
-    | Simpan kedua perubahan secara bersamaan.
+    |--------------------------------------------------------------------------
+    | Simpan transaksi
+    |--------------------------------------------------------------------------
     */
 
     $pdo->commit();
