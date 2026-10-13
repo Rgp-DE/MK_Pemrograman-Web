@@ -8,68 +8,63 @@ require_once __DIR__ . '/../includes/csrf.php';
 
 $page_title = "Pengembalian Buku";
 
-$keyword = trim(
-    $_GET['keyword'] ?? ''
-);
+$keyword = trim($_GET['keyword'] ?? '');
 
 $flash = $_SESSION['flash'] ?? null;
 unset($_SESSION['flash']);
 
 /*
 |--------------------------------------------------------------------------
-| Ambil daftar peminjaman aktif
+| Ambil transaksi peminjaman aktif
 |--------------------------------------------------------------------------
 */
 
-if ($keyword !== '') {
+$sqlDasar = "
+    SELECT
+        p.id,
+        p.tanggal_pinjam,
+        p.tanggal_jatuh_tempo,
+        b.judul,
+        a.nama,
+        a.no_anggota,
+        a.no_hp,
+        (
+            CURRENT_DATE > p.tanggal_jatuh_tempo
+        ) AS terlambat
+    FROM peminjaman p
+    JOIN buku b
+        ON b.id = p.buku_id
+    JOIN anggota a
+        ON a.id = p.anggota_id
+    WHERE p.status = 'dipinjam'
+";
 
-    $stmt = $pdo->prepare("
-        SELECT
-            p.id,
-            p.tanggal_pinjam,
-            p.tanggal_jatuh_tempo,
-            b.judul,
-            a.nama,
-            a.no_anggota,
-            (CURRENT_DATE > p.tanggal_jatuh_tempo) AS terlambat
-        FROM peminjaman p
-        JOIN buku b ON b.id = p.buku_id
-        JOIN anggota a ON a.id = p.anggota_id
-        WHERE
-            p.status = 'dipinjam'
+if ($keyword !== '') {
+    $stmt = $pdo->prepare(
+        $sqlDasar . "
             AND (
                 b.judul ILIKE :keyword
                 OR a.nama ILIKE :keyword
                 OR a.no_anggota ILIKE :keyword
+                OR a.no_hp ILIKE :keyword
             )
-        ORDER BY
-            p.tanggal_jatuh_tempo ASC,
-            p.id ASC
-    ");
+            ORDER BY
+                p.tanggal_jatuh_tempo ASC,
+                p.id ASC
+        "
+    );
 
     $stmt->execute([
         'keyword' => '%' . $keyword . '%'
     ]);
-
 } else {
-
-    $stmt = $pdo->query("
-        SELECT
-            p.id,
-            p.tanggal_pinjam,
-            p.tanggal_jatuh_tempo,
-            b.judul,
-            a.nama,
-            a.no_anggota,
-            (CURRENT_DATE > p.tanggal_jatuh_tempo) AS terlambat
-        FROM peminjaman p
-        JOIN buku b ON b.id = p.buku_id
-        JOIN anggota a ON a.id = p.anggota_id
-        WHERE p.status = 'dipinjam'
-        ORDER BY
-            p.tanggal_jatuh_tempo ASC,
-            p.id ASC
-    ");
+    $stmt = $pdo->query(
+        $sqlDasar . "
+            ORDER BY
+                p.tanggal_jatuh_tempo ASC,
+                p.id ASC
+        "
+    );
 }
 
 $daftarPeminjaman = $stmt->fetchAll(
@@ -102,7 +97,7 @@ include __DIR__ . '/../includes/header.php';
         <form method="get" action="kembali.php">
 
             <label for="search-input">
-                Cari Judul Buku atau Anggota
+                Cari Judul Buku, Anggota, atau No. HP
             </label>
 
             <input
@@ -110,18 +105,12 @@ include __DIR__ . '/../includes/header.php';
                 id="search-input"
                 name="keyword"
                 value="<?php echo e($keyword); ?>"
-                placeholder="Ketik judul atau nama anggota...">
+                placeholder="Ketik judul, nama, atau no. HP...">
 
-            <button type="submit">
-                Cari
-            </button>
+            <button type="submit">Cari</button>
 
             <?php if ($keyword !== ''): ?>
-
-                <a href="kembali.php">
-                    Reset
-                </a>
-
+                <a href="kembali.php">Reset</a>
             <?php endif; ?>
 
         </form>
@@ -138,18 +127,17 @@ include __DIR__ . '/../includes/header.php';
         <table>
 
             <thead>
-
                 <tr>
                     <th>No.</th>
                     <th>Nama Anggota</th>
                     <th>No. Anggota</th>
+                    <th>No. HP</th>
                     <th>Judul Buku</th>
                     <th>Tanggal Pinjam</th>
                     <th>Tanggal Jatuh Tempo</th>
                     <th>Status</th>
                     <th>Aksi</th>
                 </tr>
-
             </thead>
 
             <tbody>
@@ -157,7 +145,7 @@ include __DIR__ . '/../includes/header.php';
                 <?php if (empty($daftarPeminjaman)): ?>
 
                     <tr>
-                        <td colspan="8">
+                        <td colspan="9">
                             Tidak ada transaksi peminjaman aktif.
                         </td>
                     </tr>
@@ -168,9 +156,7 @@ include __DIR__ . '/../includes/header.php';
 
                         <tr>
 
-                            <td>
-                                <?php echo e($i + 1); ?>
-                            </td>
+                            <td><?php echo e($i + 1); ?></td>
 
                             <td>
                                 <?php echo e($peminjaman['nama']); ?>
@@ -178,6 +164,10 @@ include __DIR__ . '/../includes/header.php';
 
                             <td>
                                 <?php echo e($peminjaman['no_anggota']); ?>
+                            </td>
+
+                            <td>
+                                <?php echo e($peminjaman['no_hp'] ?: '-'); ?>
                             </td>
 
                             <td>
@@ -207,30 +197,27 @@ include __DIR__ . '/../includes/header.php';
                             </td>
 
                             <td>
+                                <?php
+                                $terlambat =
+                                    in_array(
+                                        $peminjaman['terlambat'],
+                                        [true, 't', 1, '1'],
+                                        true
+                                    );
+                                ?>
 
-                                <?php if (
-                                    $peminjaman['terlambat'] === true ||
-                                    $peminjaman['terlambat'] === 't' ||
-                                    $peminjaman['terlambat'] === 1 ||
-                                    $peminjaman['terlambat'] === '1'
-                                ): ?>
-
+                                <?php if ($terlambat): ?>
                                     <span class="status-terlambat">
                                         Terlambat
                                     </span>
-
                                 <?php else: ?>
-
                                     <span class="status-aman">
                                         Belum Terlambat
                                     </span>
-
                                 <?php endif; ?>
-
                             </td>
 
                             <td>
-
                                 <form
                                     method="post"
                                     action="proses_kembali.php"
@@ -250,7 +237,6 @@ include __DIR__ . '/../includes/header.php';
                                     </button>
 
                                 </form>
-
                             </td>
 
                         </tr>
